@@ -1,4 +1,4 @@
-﻿namespace EasyMessageHub.Benchmarker
+﻿namespace Easy.MessageHub.Benchmarker
 {
     using System;
     using System.Diagnostics;

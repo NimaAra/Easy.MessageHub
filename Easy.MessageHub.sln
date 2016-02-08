@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyMessageHub", "EasyMessageHub\EasyMessageHub.csproj", "{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub", "Easy.MessageHub\Easy.MessageHub.csproj", "{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyMessageHub.Benchmarker", "EasyMessageHub.Benchmarker\EasyMessageHub.Benchmarker.csproj", "{D34356C2-D3B0-4961-9947-A604FFE70CF1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub.Benchmarker", "Easy.MessageHub.Benchmarker\Easy.MessageHub.Benchmarker.csproj", "{D34356C2-D3B0-4961-9947-A604FFE70CF1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{747161C2-3854-4152-BCAB-C25D700D18BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyMessageHub.Tests.Unit", "EasyMessageHub.Tests.Unit\EasyMessageHub.Tests.Unit.csproj", "{AF6AA9B6-B277-4F05-90FE-4EFE03610B5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub.Tests.Unit", "Easy.MessageHub.Tests.Unit\Easy.MessageHub.Tests.Unit.csproj", "{AF6AA9B6-B277-4F05-90FE-4EFE03610B5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

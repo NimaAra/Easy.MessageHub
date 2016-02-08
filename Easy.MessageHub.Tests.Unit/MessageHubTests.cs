@@ -1,4 +1,4 @@
-﻿namespace EasyMessageHub.Tests.Unit
+﻿namespace Easy.MessageHub.Tests.Unit
 {
     using System;
     using System.Collections.Concurrent;

@@ -1,9 +1,8 @@
-﻿namespace EasyMessageHub.Tests.Unit
+﻿namespace Easy.MessageHub.Tests.Unit
 {
     using System;
     using NUnit.Framework;
     using Shouldly;
-
     [TestFixture]
     public sealed class HandlerTests
     {

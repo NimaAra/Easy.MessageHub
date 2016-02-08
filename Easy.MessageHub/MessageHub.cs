@@ -1,4 +1,4 @@
-﻿namespace EasyMessageHub
+﻿namespace Easy.MessageHub
 {
     using System;
     using System.Collections.Generic;
