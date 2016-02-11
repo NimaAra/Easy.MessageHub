@@ -106,7 +106,7 @@
         {
             EnsureNotNull(token);
             EnsureNotDisposed();
-
+            
             lock (_subscriptions)
             {
                 _subscriptions.RemoveAll(s => s.Token == token);
@@ -148,6 +148,8 @@
         public void Dispose()
         {
             Interlocked.Increment(ref _disposed);
+            _localSubscriptions.Dispose();
+            _localSubscriptionRevision.Dispose();
         }
 
         /// <summary>
