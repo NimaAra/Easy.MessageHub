@@ -2,6 +2,10 @@
 {
     using System;
 
+    /// <summary>
+    /// A class to represent handling of an event.
+    /// </summary>
+    /// <typeparam name="T">The type of the event to handle</typeparam>
     public class Handler<T>
     {
         private readonly Action<T> _onMessage;
