@@ -204,7 +204,6 @@
 
                 try
                 {
-                    // ReSharper disable once PossibleNullReferenceException
                     handler(message);
                 }
                 catch (Exception e)
