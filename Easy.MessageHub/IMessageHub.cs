@@ -5,8 +5,7 @@
     /// <summary>
     /// An implementation of the <c>Event Aggregator</c> pattern.
     /// </summary>
-    /// <typeparam name="TMsgBase">The type of the message to be published</typeparam>
-    public interface IMessageHub<TMsgBase> : IDisposable
+    public interface IMessageHub : IDisposable
     {
         /// <summary>
         /// Invoked if an error occurs when publishing the message to a subscriber.
@@ -14,50 +13,44 @@
         event EventHandler<MessageHubErrorEventArgs> OnError;
 
         /// <summary>
-        /// Registers a callback which is invoked on every message published by the <see cref="MessageHub{TMsgBase}"/>
+        /// Registers a callback which is invoked on every message published by the <see cref="IMessageHub"/>.
         /// <remarks>Invoking this method with a new <paramref name="onMessage"/>overwrites the previous one.</remarks>
         /// </summary>
-        /// <param name="onMessage">The callback to invoke on every message</param>
-        void RegisterGlobalHandler(Action<TMsgBase> onMessage);
+        /// <param name="onMessage">
+        /// The callback to invoke on every message
+        /// <remarks>The callback receives the type of the message and the message as arguments</remarks>
+        /// </param>
+        void RegisterGlobalHandler(Action<Type, object> onMessage);
 
         /// <summary>
-        /// Publishes the <paramref name="message"/>.
+        /// Publishes the <paramref name="message"/> on the <see cref="IMessageHub"/>.
         /// </summary>
-        /// <param name="message">The message to be published.</param>
-        void Publish(TMsgBase message);
+        /// <param name="message">The message to published</param>
+        void Publish<T>(T message);
 
         /// <summary>
-        /// Subscribes a handler against the <see cref="MessageHub{TMsgBase}"/> for a certain type of message.
+        /// Subscribes a callback against the <see cref="IMessageHub"/> for a specific type of message.
         /// </summary>
-        /// <typeparam name="TMsg">The type of message to subscribe to.</typeparam>
-        /// <param name="handler">The handler to be invoked once the message is published by the <see cref="MessageHub{TMsgBase}"/></param>
+        /// <typeparam name="T">The type of message to subscribe to</typeparam>
+        /// <param name="action">The callback to be invoked once the message is published on the <see cref="IMessageHub"/></param>
         /// <returns>The token representing the subscription</returns>
-        Guid Subscribe<TMsg>(Handler<TMsg> handler) where TMsg : TMsgBase;
+        Guid Subscribe<T>(Action<T> action);
 
         /// <summary>
-        /// Subscribes a callback and a predicate against the <see cref="MessageHub{TMsgBase}"/> for a certain type of message.
-        /// </summary>
-        /// <typeparam name="TMsg">The type of message to subscribe to.</typeparam>
-        /// <param name="action">The callback to be invoked once the message is published by the <see cref="MessageHub{TMsgBase}"/></param>
-        /// <param name="predicate">The predicate which indicates whether the message should be published to the subscriber or not</param>
-        /// <returns>The token representing the subscription</returns>
-        Guid Subscribe<TMsg>(Action<TMsg> action, Predicate<TMsg> predicate = null) where TMsg : TMsgBase;
-
-        /// <summary>
-        /// Un-Subscribes a subscription from the <see cref="MessageHub{TMsgBase}"/>.
+        /// Un-Subscribes a subscription from the <see cref="IMessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
         void UnSubscribe(Guid token);
 
         /// <summary>
-        /// Checks if a subscription is active on the <see cref="MessageHub{TMsgBase}"/>.
+        /// Checks if a specific subscription is active on the <see cref="IMessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
         /// <returns><c>True</c> if the subscription is active otherwise <c>False</c></returns>
         bool IsSubscribed(Guid token);
 
         /// <summary>
-        /// Clears all the subscriptions from the <see cref="MessageHub{TMsgBase}"/>.
+        /// Clears all the subscriptions from the <see cref="IMessageHub"/>.
         /// <remarks>The global handler and the <see cref="OnError"/> are not affected</remarks>
         /// </summary>
         void ClearSubscriptions();

@@ -15,10 +15,10 @@
 //            MessageAggregatorSinglePublisherSingleSubscriber();
 //            ClassicMethodSinglePublisherSingleSubscriber();
 //
-//            MessageAggregatorSinglePublisherMultipleSubscriber();
+            MessageAggregatorSinglePublisherMultipleSubscriber();
 //            ClassicMethodSinglePublisherMultipleSubscriber();
 //
-            MessageAggregatorMultiplePublisherSingleSubscriber();
+//            MessageAggregatorMultiplePublisherSingleSubscriber();
 //            ClassicMethodMultiplePublisherSingleSubscriber();
 
 //            MessageAggregatorMultiplePublisherSingleSubscriberAndGlobalAuditHandler();
@@ -34,10 +34,10 @@
         {
             long globalCount = 0;
             long result = 0;
-            var messageAgg = MessageHub<string>.Instance;
-            messageAgg.RegisterGlobalHandler(msg => Interlocked.Increment(ref globalCount));
+            var messageAgg = MessageHub.Instance;
+            messageAgg.RegisterGlobalHandler((type, msg) => Interlocked.Increment(ref globalCount));
 
-            var subscriber = new Handler<string>(msg => Interlocked.Increment(ref result));
+            Action<string> subscriber = msg => Interlocked.Increment(ref result);
             messageAgg.Subscribe(subscriber);
 
             var sw = Stopwatch.StartNew();
@@ -57,8 +57,8 @@
         public static void MessageAggregatorMultiplePublisherSingleSubscriber()
         {
             long result = 0;
-            var messageAgg = MessageHub<string>.Instance;
-            var subscriber = new Handler<string>(msg => result++);
+            var messageAgg = MessageHub.Instance;
+            Action<string> subscriber = msg => result++;
             messageAgg.Subscribe(subscriber);
 
             var sw = Stopwatch.StartNew();
@@ -75,8 +75,8 @@
         public static void MessageAggregatorSinglePublisherSingleSubscriber()
         {
             long result = 0;
-            var messageAgg = MessageHub<string>.Instance;
-            var subscriber = new Handler<string>(msg => result++);
+            var messageAgg = MessageHub.Instance;
+            Action<string> subscriber = msg => result++;
             messageAgg.Subscribe(subscriber);
 
             var sw = Stopwatch.StartNew();
@@ -91,10 +91,10 @@
         public static void MessageAggregatorSinglePublisherMultipleSubscriber()
         {
             long result = 0;
-            var messageAgg = MessageHub<string>.Instance;
-            var subscriber1 = new Handler<string>(msg => Interlocked.Increment(ref result));
-            var subscriber2 = new Handler<string>(msg => Interlocked.Increment(ref result));
-            var subscriber3 = new Handler<string>(msg => Interlocked.Increment(ref result));
+            var messageAgg = MessageHub.Instance;
+            Action<string> subscriber1 = msg => Interlocked.Increment(ref result);
+            Action<string> subscriber2 = msg => Interlocked.Increment(ref result);
+            Action<string> subscriber3 = msg => Interlocked.Increment(ref result);
 
             messageAgg.Subscribe(subscriber1);
             messageAgg.Subscribe(subscriber2);
