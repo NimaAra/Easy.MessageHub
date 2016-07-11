@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Easy.MessageHub.Tests.Unit</RootNamespace>
     <AssemblyName>Easy.MessageHub.Tests.Unit</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -52,6 +52,8 @@
   <ItemGroup>
     <Compile Include="MessageHubAssertions.cs" />
     <Compile Include="MessageHubTests.cs" />
+    <Compile Include="SubscriptionsTests.cs" />
+    <Compile Include="SubscriptionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

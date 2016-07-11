@@ -438,12 +438,6 @@
             Should.Throw<ObjectDisposedException>(() => aggregator.Subscribe(handler))
                 .Message.ShouldBe($"Cannot access a disposed object.\r\nObject name: '{aggregator.GetType().Name}'.");
 
-            Should.Throw<ObjectDisposedException>(() => aggregator.Publish("hi"))
-                .Message.ShouldBe($"Cannot access a disposed object.\r\nObject name: '{aggregator.GetType().Name}'.");
-
-            Should.Throw<ObjectDisposedException>(() => aggregator.Publish("hi"))
-                .Message.ShouldBe($"Cannot access a disposed object.\r\nObject name: '{aggregator.GetType().Name}'.");
-
             Should.Throw<ObjectDisposedException>(() => aggregator.UnSubscribe(token))
                 .Message.ShouldBe($"Cannot access a disposed object.\r\nObject name: '{aggregator.GetType().Name}'.");
 

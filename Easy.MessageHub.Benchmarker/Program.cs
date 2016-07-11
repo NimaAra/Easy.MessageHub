@@ -12,25 +12,25 @@
 
         private static void Main()
         {
-//            MessageAggregatorSinglePublisherSingleSubscriber();
+//            HubSinglePublisherSingleSubscriber();
 //            ClassicMethodSinglePublisherSingleSubscriber();
-//
-            MessageAggregatorSinglePublisherMultipleSubscriber();
+
+            HubSinglePublisherMultipleSubscriber();
 //            ClassicMethodSinglePublisherMultipleSubscriber();
-//
-//            MessageAggregatorMultiplePublisherSingleSubscriber();
+
+//            HubMultiplePublisherSingleSubscriber();
 //            ClassicMethodMultiplePublisherSingleSubscriber();
 
-//            MessageAggregatorMultiplePublisherSingleSubscriberAndGlobalAuditHandler();
+//            HubMultiplePublisherSingleSubscriberAndGlobalAuditHandler();
+            
+//            HubSinglePublisherMultipleSubscriberThrottled();
 
-            Console.WriteLine("Gen 0: {0}", GC.CollectionCount(0));
-            Console.WriteLine("Gen 1: {0}", GC.CollectionCount(1));
-            Console.WriteLine("Gen 2: {0}", GC.CollectionCount(2));
-
-            Console.ReadLine();
+            Console.WriteLine($"Gen 0: {GC.CollectionCount(0).ToString()}");
+            Console.WriteLine($"Gen 1: {GC.CollectionCount(1).ToString()}");
+            Console.WriteLine($"Gen 2: {GC.CollectionCount(2).ToString()}");
         }
 
-        public static void MessageAggregatorMultiplePublisherSingleSubscriberAndGlobalAuditHandler()
+        public static void HubMultiplePublisherSingleSubscriberAndGlobalAuditHandler()
         {
             long globalCount = 0;
             long result = 0;
@@ -51,10 +51,10 @@
 
             Parallel.Invoke(action, action, action, action, action);
 
-            Console.WriteLine("Result is: {0:n0} Time Taken: {1}", result, sw.Elapsed);
+            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
         }
 
-        public static void MessageAggregatorMultiplePublisherSingleSubscriber()
+        public static void HubMultiplePublisherSingleSubscriber()
         {
             long result = 0;
             var messageAgg = MessageHub.Instance;
@@ -69,10 +69,10 @@
 
             Task.WaitAll(tasks, Duration);
 
-            Console.WriteLine("Result is: {0:n0} Time Taken: {1}", result, sw.Elapsed);
+            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
         }
 
-        public static void MessageAggregatorSinglePublisherSingleSubscriber()
+        public static void HubSinglePublisherSingleSubscriber()
         {
             long result = 0;
             var messageAgg = MessageHub.Instance;
@@ -85,28 +85,53 @@
                 messageAgg.Publish("Hello there!");
             }
 
-            Console.WriteLine("Result is: {0:n0} Time Taken: {1}", result, sw.Elapsed);
+            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
         }
 
-        public static void MessageAggregatorSinglePublisherMultipleSubscriber()
+        public static void HubSinglePublisherMultipleSubscriber()
         {
             long result = 0;
             var messageAgg = MessageHub.Instance;
-            Action<string> subscriber1 = msg => Interlocked.Increment(ref result);
-            Action<string> subscriber2 = msg => Interlocked.Increment(ref result);
-            Action<string> subscriber3 = msg => Interlocked.Increment(ref result);
+            Action<int> subscriber1 = msg => Interlocked.Increment(ref result);
+            Action<int> subscriber2 = msg => Interlocked.Increment(ref result);
+            Action<int> subscriber3 = msg => Interlocked.Increment(ref result);
 
             messageAgg.Subscribe(subscriber1);
             messageAgg.Subscribe(subscriber2);
             messageAgg.Subscribe(subscriber3);
 
+            var counter = 0;
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed < Duration)
             {
-                messageAgg.Publish("Hello there!");
+                messageAgg.Publish(counter++);
             }
 
-            Console.WriteLine("Result is: {0:n0} Time Taken: {1}", result, sw.Elapsed);
+            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+        }
+
+        public static void HubSinglePublisherMultipleSubscriberThrottled()
+        {
+            long counter = 0;
+            var messageAgg = MessageHub.Instance;
+            messageAgg.RegisterGlobalHandler((type, msg) =>
+            {
+                Console.WriteLine($"Global: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
+            });
+
+            Action<long> subscriber = msg =>
+            {
+                Console.WriteLine($"Subscriber: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
+            };
+
+            messageAgg.Subscribe(subscriber, TimeSpan.FromSeconds(1));
+
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed < Duration)
+            {
+                messageAgg.Publish(counter++);
+                Thread.Sleep(100);
+            }
         }
 
         public static void ClassicMethodMultiplePublisherSingleSubscriber()
@@ -129,7 +154,7 @@
 
             Parallel.Invoke(action, action, action, action, action);
 
-            Console.WriteLine("Result is: {0:n0} Time Taken: {1}", result, sw.Elapsed);
+            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
         }
 
         public static void ClassicMethodSinglePublisherSingleSubscriber()
@@ -147,7 +172,7 @@
                 publisher.Publish("Hello there!");
             }
 
-            Console.WriteLine("Result is: {0:n0} Time Taken: {1}", result, sw.Elapsed);
+            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
         }
 
         public static void ClassicMethodSinglePublisherMultipleSubscriber()
@@ -180,7 +205,7 @@
                 publisher.Publish("Hello there!");
             }
 
-            Console.WriteLine("Result is: {0:n0} Time Taken: {1}", result, sw.Elapsed);
+            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
         }
     }
 
