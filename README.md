@@ -62,7 +62,7 @@ hub.Subscribe<string>(msg =>
 ```
 
 #### Inheritance support:
-The hub supports inheritance by allowing to subscribe to a base class or an interface and receiving all the publications of types that inherit of implement the subscribed type. For example given:
+The hub supports inheritance by allowing to subscribe to a base class or an interface and receiving all the publications of types that inherit or implement the subscribed type. For example, given:
 
 ```csharp
 public class Order {}
