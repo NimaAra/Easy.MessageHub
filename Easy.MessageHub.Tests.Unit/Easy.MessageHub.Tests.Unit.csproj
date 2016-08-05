@@ -62,13 +62,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Easy.MessageHub\Easy.MessageHub.csproj">
-      <Project>{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}</Project>
-      <Name>Easy.MessageHub</Name>
-    </ProjectReference>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <ProjectReference Include="..\Easy.MessageHub\Easy.MessageHub.csproj">
+      <Project>{e29798cd-7146-4d97-8653-25516fc20d73}</Project>
+      <Name>Easy.MessageHub</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

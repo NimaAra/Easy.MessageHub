@@ -1,12 +1,12 @@
 ﻿namespace Easy.MessageHub.Benchmarker
 {
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
+	using System;
+	using System.Diagnostics;
+	using System.Linq;
+	using System.Threading;
+	using System.Threading.Tasks;
 
-    internal class Program
+	internal class Program
     {
         private static readonly TimeSpan Duration = TimeSpan.FromSeconds(10);
 
