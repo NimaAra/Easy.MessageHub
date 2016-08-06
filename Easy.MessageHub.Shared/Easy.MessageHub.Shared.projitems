@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>9ed4681f-9452-45c3-a0d7-a215f01a1f60</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Easy.MessageHub.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)IMessageHub.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHub.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHubErrorEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Subscription.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Subscriptions.cs" />
+  </ItemGroup>
+</Project>

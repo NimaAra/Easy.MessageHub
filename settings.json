@@ -1,0 +1,34 @@
+{
+	"version": {
+		"VersionFile": "./version.json",
+		"LoadFrom": "versionfile",
+		"AutoIncrementVersion": false,
+	},
+	"build": {
+		"SourcePath": "./",
+		"SolutionFileSpec": "./Easy.MessageHub.sln",
+		"TreatWarningsAsErrors": false,
+		"EnableXamarinIOS": false,
+		"MacAgentIPAddress": "",
+		"MacAgentUserName": "",
+		"MacAgentUserPassword": ""
+	},
+	"test": {
+		"SourcePath": "./Easy.MessageHub.Tests.Unit",
+		"ResultsPath": "./",
+		"AssemblyFileSpec": "Easy.MessageHub.Tests.Unit.dll",
+		"Framework": "NUnit3"
+	},
+	"nuget": {
+		"NuGetConfig": "./.nuget/NuGet.config",
+		"FeedUrl": "https://nuget.com",
+		"FeedAPIKey": "",
+		"ArtifactsPath": "./artifacts/packages",
+		"NuspecPath": "./nuspec",
+		"UpdateVersion": true,
+		"UpdateLibraryDependencies": false,
+		"VersionDependencyForLibrary": "greaterthanorequal",
+		"LibraryNamespaceBase": "Easy.MessageHub",
+		"LibraryMinVersionDependency": ""
+	}
+}

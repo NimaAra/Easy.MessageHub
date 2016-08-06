@@ -1,13 +1,15 @@
-﻿namespace Easy.MessageHub
-{
-    using System;
-    using System.Diagnostics;
-    using System.Threading;
+﻿using System.Reflection;
 
-    /// <summary>
-    /// An implementation of the <c>Event Aggregator</c> pattern.
-    /// </summary>
-    public sealed class MessageHub : IMessageHub
+namespace Easy.MessageHub
+{
+	using System;
+	using System.Diagnostics;
+	using System.Threading;
+
+	/// <summary>
+	/// An implementation of the <c>Event Aggregator</c> pattern.
+	/// </summary>
+	public sealed class MessageHub : IMessageHub
     {
         private static readonly Lazy<MessageHub> Lazy = new Lazy<MessageHub>(() => new MessageHub(), true);
 
@@ -58,11 +60,14 @@
             for (var idx = 0; idx < localSubscriptions.Length; idx++)
             {
                 var subscription = localSubscriptions[idx];
+#if _NET40
+				if (!subscription.Type.IsAssignableFrom(msgType)) { continue; }
+#else
+				if (!subscription.Type.GetTypeInfo().IsAssignableFrom(msgType.GetTypeInfo())) { continue; }
+#endif
 
-                if (!subscription.Type.IsAssignableFrom(msgType)) { continue; }
-
-                try
-                {
+				try
+				{
                     subscription.Handle(message);
                 }
                 catch (Exception e)
