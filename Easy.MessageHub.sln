@@ -11,13 +11,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub.Tests.Unit"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB5AD515-CFD8-476F-9E7C-697C92510430}"
 	ProjectSection(SolutionItems) = preProject
-		Easy.MessageHub\Easy.MessageHub.nuspec = Easy.MessageHub\Easy.MessageHub.nuspec
+		nuspec\Easy.MessageHub.nuspec = nuspec\Easy.MessageHub.nuspec
 		README.md = README.md
+		settings.json = settings.json
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub", "Easy.MessageHub\Easy.MessageHub.csproj", "{E29798CD-7146-4D97-8653-25516FC20D73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub.NET", "Easy.MessageHub\Easy.MessageHub.NET.csproj", "{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Easy.MessageHub.Shared", "Easy.MessageHub.Shared\Easy.MessageHub.Shared.shproj", "{9ED4681F-9452-45C3-A0D7-A215F01A1F60}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{60E3BC7C-B91B-4C76-B863-04B860E9D1DD}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Easy.MessageHub.Shared\Easy.MessageHub.Shared.projitems*{9ed4681f-9452-45c3-a0d7-a215f01a1f60}*SharedItemsImports = 13
+		Easy.MessageHub.Shared\Easy.MessageHub.Shared.projitems*{e11f0ddc-a37d-490b-b5b9-5e9d7e0116e0}*SharedItemsImports = 4
+		Easy.MessageHub.Shared\Easy.MessageHub.Shared.projitems*{e29798cd-7146-4d97-8653-25516fc20d73}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -35,11 +48,19 @@ Global
 		{E29798CD-7146-4D97-8653-25516FC20D73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E29798CD-7146-4D97-8653-25516FC20D73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E29798CD-7146-4D97-8653-25516FC20D73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{D34356C2-D3B0-4961-9947-A604FFE70CF1} = {747161C2-3854-4152-BCAB-C25D700D18BD}
 		{AF6AA9B6-B277-4F05-90FE-4EFE03610B5E} = {747161C2-3854-4152-BCAB-C25D700D18BD}
+		{E29798CD-7146-4D97-8653-25516FC20D73} = {60E3BC7C-B91B-4C76-B863-04B860E9D1DD}
+		{E11F0DDC-A37D-490B-B5B9-5E9D7E0116E0} = {60E3BC7C-B91B-4C76-B863-04B860E9D1DD}
+		{9ED4681F-9452-45C3-A0D7-A215F01A1F60} = {60E3BC7C-B91B-4C76-B863-04B860E9D1DD}
 	EndGlobalSection
 EndGlobal

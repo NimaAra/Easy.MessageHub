@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>Easy.MessageHub</id>
+		<version>2.5.1.0</version>
+		<title>Easy MessageHub</title>
+		<authors>Nima Ara</authors>
+		<owners>Nima Ara</owners>    
+		<projectUrl>https://github.com/NimaAra/Easy.MessageHub</projectUrl>    
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>An implementation of the EventAggregator pattern.</description>    
+		<releaseNotes>https://github.com/NimaAra/Easy.MessageHub/releases/tag/v2.5.0.0</releaseNotes>
+		<copyright>Copyright 2016</copyright>
+		<tags>EventAggregator MessageHub Publish Subscribe</tags>
+	</metadata>
+	<files>
+		<!-- PCL/.NETStandard -->
+		<file src="..\Easy.MessageHub\bin\$configuration$\Easy.MessageHub.dll" target="lib\portable-net45+netcore45+MonoAndroid10+xamarinios10+MonoTouch10" />
+		<file src="..\Easy.MessageHub\bin\$configuration$\Easy.MessageHub.XML" target="lib\portable-net45+netcore45+MonoAndroid10+xamarinios10+MonoTouch10" />
+
+		<!-- .NET 4.0 -->
+		<file src="..\Easy.MessageHub\bin\$configuration$\Easy.MessageHub.NET.dll" target="lib\net4" />
+		<file src="..\Easy.MessageHub\bin\$configuration$\Easy.MessageHub.NET.XML" target="lib\net4" />
+	</files>
+</package>

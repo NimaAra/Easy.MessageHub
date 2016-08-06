@@ -60,11 +60,14 @@ namespace Easy.MessageHub
             for (var idx = 0; idx < localSubscriptions.Length; idx++)
             {
                 var subscription = localSubscriptions[idx];
+#if _NET40
+				if (!subscription.Type.IsAssignableFrom(msgType)) { continue; }
+#else
+				if (!subscription.Type.GetTypeInfo().IsAssignableFrom(msgType.GetTypeInfo())) { continue; }
+#endif
 
-                if (!subscription.Type.GetTypeInfo().IsAssignableFrom(msgType.GetTypeInfo())) { continue; }
-
-                try
-                {
+				try
+				{
                     subscription.Handle(message);
                 }
                 catch (Exception e)
