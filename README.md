@@ -11,6 +11,7 @@ Supports _.Net Core_ (_.Net 3.5_ & _netstandard1.0) running on:
 * Windows 8.0
 * Windows PHone 8.1
 * Windows Phone Seilverlight 8.0
+
 ___
 
 
