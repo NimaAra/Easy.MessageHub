@@ -3,23 +3,31 @@
     using System;
     using System.Diagnostics;
     using System.Threading;
+#if NETSTANDARD1_0
+    using System.Reflection;
+#endif   
 
     /// <summary>
     /// An implementation of the <c>Event Aggregator</c> pattern.
     /// </summary>
     public sealed class MessageHub : IMessageHub
     {
-        private static readonly Lazy<MessageHub> Lazy = new Lazy<MessageHub>(() => new MessageHub(), true);
+    #region Singleton
+        // ReSharper disable once InconsistentNaming
+        private static readonly MessageHub _instance = new MessageHub();
+        static MessageHub() { } // Empty static constructor - forces laziness
+        private MessageHub() { }
+    #endregion
+
 
         private Action<Type, object> _globalHandler;
         private int _disposed;
 
-        private MessageHub() {}
-
         /// <summary>
         /// Returns a single instance of the <see cref="MessageHub"/>
         /// </summary>
-        public static MessageHub Instance => Lazy.Value;
+        // ReSharper disable once ConvertToAutoProperty
+        public static MessageHub Instance => _instance;
 
         /// <summary>
         /// Invoked if an error occurs when publishing the message to a subscriber.
@@ -52,6 +60,9 @@
 
             var msgType = typeof(T);
 
+#if NET_STANDARD
+            var msgTypeInfo = msgType.GetTypeInfo();
+#endif
             _globalHandler?.Invoke(msgType, message);
 
             // ReSharper disable once ForCanBeConvertedToForeach | Performance Critical
@@ -59,8 +70,11 @@
             {
                 var subscription = localSubscriptions[idx];
 
+#if NET_STANDARD
+                if (!subscription.Type.GetTypeInfo().IsAssignableFrom(msgTypeInfo)) { continue; }
+#else
                 if (!subscription.Type.IsAssignableFrom(msgType)) { continue; }
-
+#endif
                 try
                 {
                     subscription.Handle(message);
