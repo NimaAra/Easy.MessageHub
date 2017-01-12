@@ -3,7 +3,7 @@
 # Easy.MessageHub
 An implementation of the Event Aggregator Pattern.
 
-Supports _.Net Core_ (_.Net 3.5_ & _netstandard1.0) running on:
+Supports _.Net Core_ (_.Net 3.5_ & _netstandard1.0_) running on:
 * .Net Core
 * .Net Framework 3.5 and above
 * Mono & Xamarin
