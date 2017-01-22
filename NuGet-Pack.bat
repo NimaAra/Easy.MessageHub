@@ -1,2 +1,3 @@
 @echo off
-dotnet pack --output NuGet --configuration Release Easy.MessageHub
+dotnet restore Easy.MessageHub
+dotnet pack -o NuGet -c Release Easy.MessageHub
