@@ -24,7 +24,6 @@ var hub = MessageHub.Instance;
 
 You can now use the hub to subscribe to any publication of a given type:
 ```csharp
-var hub = MessageHub.Instance;
 var token = hub.Subscribe<Person>(p => Console.WriteLine($"Id is: {p.Id}"));
 // or    
 Action<string> action = message => Console.WriteLine($"Message is: {message}");
