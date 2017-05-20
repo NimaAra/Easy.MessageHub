@@ -37,6 +37,15 @@
         Guid Subscribe<T>(Action<T> action);
 
         /// <summary>
+        /// Subscribes a callback against the <see cref="MessageHub"/> for a specific type of message.
+        /// </summary>
+        /// <typeparam name="T">The type of message to subscribe to</typeparam>
+        /// <param name="action">The callback to be invoked once the message is published on the <see cref="MessageHub"/></param>
+        /// <param name="throttleBy">The <see cref="TimeSpan"/> specifying the rate at which subscription is throttled</param>
+        /// <returns>The token representing the subscription</returns>
+        Guid Subscribe<T>(Action<T> action, TimeSpan throttleBy);
+
+        /// <summary>
         /// Un-Subscribes a subscription from the <see cref="IMessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>

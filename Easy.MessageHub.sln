@@ -1,21 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{747161C2-3854-4152-BCAB-C25D700D18BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub", "Easy.MessageHub\Easy.MessageHub.csproj", "{833AB5AD-A0C5-4F41-A4BD-1EC011AD8677}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB5AD515-CFD8-476F-9E7C-697C92510430}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub.Tests.Unit", "Easy.MessageHub.Tests.Unit\Easy.MessageHub.Tests.Unit.csproj", "{DA3AC7C6-A608-4CEF-9CBE-AC0FA6C04DC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub.Benchmarker.Core", "Easy.MessageHub.Benchmarker.Core\Easy.MessageHub.Benchmarker.Core.csproj", "{5AB6C51D-96B3-4B53-95D5-6AD58E482D1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.MessageHub.Benchmarker", "Easy.MessageHub.Benchmarker\Easy.MessageHub.Benchmarker.csproj", "{3D23C3FE-7BB0-4DDC-82B4-B78E4671D3B3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B0D8EB81-516C-4A79-A2DB-1C66D66F9406}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
+		LICENSE = LICENSE
+		NuGet-Pack.bat = NuGet-Pack.bat
 		README.md = README.md
 	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Easy.MessageHub", "Easy.MessageHub\Easy.MessageHub.xproj", "{2B196369-1048-48E0-B824-EE12509F43CF}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Easy.MessageHub.Tests.Unit", "Easy.MessageHub.Tests.Unit\Easy.MessageHub.Tests.Unit.xproj", "{7285D978-B2A3-4B5F-B0F6-A645CAF3A3E3}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Easy.MessageHub.Benchmarker", "Easy.MessageHub.Benchmarker\Easy.MessageHub.Benchmarker.xproj", "{80FBB4D4-F86D-4187-B5A7-1781DA5C0740}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,23 +24,24 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2B196369-1048-48E0-B824-EE12509F43CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B196369-1048-48E0-B824-EE12509F43CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B196369-1048-48E0-B824-EE12509F43CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B196369-1048-48E0-B824-EE12509F43CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7285D978-B2A3-4B5F-B0F6-A645CAF3A3E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7285D978-B2A3-4B5F-B0F6-A645CAF3A3E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7285D978-B2A3-4B5F-B0F6-A645CAF3A3E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7285D978-B2A3-4B5F-B0F6-A645CAF3A3E3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80FBB4D4-F86D-4187-B5A7-1781DA5C0740}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80FBB4D4-F86D-4187-B5A7-1781DA5C0740}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80FBB4D4-F86D-4187-B5A7-1781DA5C0740}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80FBB4D4-F86D-4187-B5A7-1781DA5C0740}.Release|Any CPU.Build.0 = Release|Any CPU
+		{833AB5AD-A0C5-4F41-A4BD-1EC011AD8677}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{833AB5AD-A0C5-4F41-A4BD-1EC011AD8677}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{833AB5AD-A0C5-4F41-A4BD-1EC011AD8677}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{833AB5AD-A0C5-4F41-A4BD-1EC011AD8677}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA3AC7C6-A608-4CEF-9CBE-AC0FA6C04DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA3AC7C6-A608-4CEF-9CBE-AC0FA6C04DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA3AC7C6-A608-4CEF-9CBE-AC0FA6C04DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA3AC7C6-A608-4CEF-9CBE-AC0FA6C04DC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AB6C51D-96B3-4B53-95D5-6AD58E482D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AB6C51D-96B3-4B53-95D5-6AD58E482D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AB6C51D-96B3-4B53-95D5-6AD58E482D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AB6C51D-96B3-4B53-95D5-6AD58E482D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D23C3FE-7BB0-4DDC-82B4-B78E4671D3B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D23C3FE-7BB0-4DDC-82B4-B78E4671D3B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D23C3FE-7BB0-4DDC-82B4-B78E4671D3B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D23C3FE-7BB0-4DDC-82B4-B78E4671D3B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{7285D978-B2A3-4B5F-B0F6-A645CAF3A3E3} = {747161C2-3854-4152-BCAB-C25D700D18BD}
 	EndGlobalSection
 EndGlobal

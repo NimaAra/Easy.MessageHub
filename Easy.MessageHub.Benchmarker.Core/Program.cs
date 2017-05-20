@@ -1,4 +1,4 @@
-﻿namespace Easy.MessageHub.Benchmarker
+﻿namespace Easy.MessageHub.Benchmarker.Core
 {
     using System;
     using System.Diagnostics;
@@ -62,7 +62,7 @@
             messageAgg.Subscribe(subscriber);
 
             var sw = Stopwatch.StartNew();
-            var tasks = Enumerable.Range(0, 5).Select(n => Task.Factory.StartNew(() =>
+            var tasks = Enumerable.Range(0, 5).Select(n => Task.Run(() =>
             {
                 while (true) { messageAgg.Publish("Hello there!"); }
             })).ToArray();
@@ -181,19 +181,19 @@
 
             var publisher = new Publisher<string>();
 
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 var subscriber1 = new Subscriber<string>(publisher);
                 subscriber1.Subscribe(msg => Interlocked.Increment(ref result));
             });
 
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 var subscriber2 = new Subscriber<string>(publisher);
                 subscriber2.Subscribe(msg => Interlocked.Increment(ref result));
             });
 
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 var subscriber3 = new Subscriber<string>(publisher);
                 subscriber3.Subscribe(msg => Interlocked.Increment(ref result));
@@ -214,20 +214,10 @@
         public void Publish(T message)
         {
             var copy = OnMessage;
-            copy?.Invoke(this, new GenericEventArgs<T>(message));
+            copy?.Invoke(this, message);
         }
 
-        public event EventHandler<GenericEventArgs<T>> OnMessage;
-    }
-
-    public sealed class GenericEventArgs<T> : EventArgs
-    {
-        public GenericEventArgs(T message)
-        {
-            Message = message;
-        }
-
-        public T Message { get; }
+        public event EventHandler<T> OnMessage;
     }
 
     public sealed class Subscriber<T>
@@ -239,7 +229,7 @@
             _publisher = publisher;
         }
 
-        public void Subscribe(Action<GenericEventArgs<T>> onMessage)
+        public void Subscribe(Action<T> onMessage)
         {
             _publisher.OnMessage += (sender, msg) => onMessage(msg);
         }

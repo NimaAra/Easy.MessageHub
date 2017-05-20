@@ -1,6 +1,0 @@
-{
-  "projects": [ "Easy.MessageHub", "Easy.MessageHub.Tests.Unit" ],
-  "sdk": {
-    "version": "1.0.0-preview2-003131"
-  }
-}

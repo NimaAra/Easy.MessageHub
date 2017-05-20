@@ -69,6 +69,7 @@ hub.Subscribe<string>(msg =>
 	Console.WriteLine($"Message is: {msg}"), 
 	TimeSpan.FromSeconds(1));
 ```
+In the above example, if the subscriber receives more than one message within _1_ second of another, it drops them.
 
 #### Inheritance support:
 The hub supports inheritance by allowing to subscribe to a base class or an interface and receiving all the publications of types that inherit or implement the subscribed type. For example, given:

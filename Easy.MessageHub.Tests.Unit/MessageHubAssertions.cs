@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Threading;
     using Shouldly;
-
+    
     public static class MessageHubAssertions
     {
         public static void Run()

@@ -3,7 +3,7 @@
     using System;
     using System.Diagnostics;
     using System.Threading;
-#if NETSTANDARD1_0
+#if NET_STANDARD
     using System.Reflection;
 #endif   
 
