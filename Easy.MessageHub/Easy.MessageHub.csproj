@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Description>An implementation of the EventAggregator pattern.</Description>
+    <Summary>Decouples your publishers and subscribers from one another.</Summary>
     <Copyright>2017 Nima Ara</Copyright>
     <AssemblyTitle>Easy MessageHub</AssemblyTitle>
     <VersionPrefix>0.0.0</VersionPrefix>
