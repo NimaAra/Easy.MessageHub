@@ -9,7 +9,7 @@ Supports _.Net Core_ (_.Net 3.5_ & _netstandard1.0_) running on:
 * Mono & Xamarin
 * UWP
 * Windows 8.0
-* Windows PHone 8.1
+* Windows Phone 8.1
 * Windows Phone Seilverlight 8.0
 
 ___
