@@ -3,11 +3,12 @@ namespace Easy.MessageHub
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
 
     internal static class Subscriptions
     {
         private static readonly List<Subscription> AllSubscriptions = new List<Subscription>();
-        private static int _subscriptionRevision;
+        private static int _subscriptionsChangeCounter;
 
         [ThreadStatic]
         private static int _localSubscriptionRevision;
@@ -24,7 +25,7 @@ namespace Easy.MessageHub
             lock (AllSubscriptions)
             {
                 AllSubscriptions.Add(subscription);
-                _subscriptionRevision++;
+                _subscriptionsChangeCounter++;
             }
 
             return key;
@@ -34,10 +35,19 @@ namespace Easy.MessageHub
         {
             lock (AllSubscriptions)
             {
-                var subscription = AllSubscriptions.FirstOrDefault(s => s.Token == token);
-                var removed = AllSubscriptions.Remove(subscription);
+                var subscription = AllSubscriptions.Find(s => s.Token == token);
+                if (subscription == null) { return; }
 
-                if (removed) { _subscriptionRevision++; }
+                var removed = AllSubscriptions.Remove(subscription);
+                if (!removed) { return; }
+
+                var localIdx = Array.IndexOf(_localSubscriptions, subscription);
+                if (localIdx >= 0)
+                {
+                    _localSubscriptions = RemoveAt(_localSubscriptions, localIdx);
+                }
+
+                _subscriptionsChangeCounter++;
             }
         }
 
@@ -46,7 +56,8 @@ namespace Easy.MessageHub
             lock (AllSubscriptions)
             {
                 AllSubscriptions.Clear();
-                _subscriptionRevision++;
+                Array.Clear(_localSubscriptions, 0, _localSubscriptions.Length);
+                _subscriptionsChangeCounter++;
             }
         }
 
@@ -55,33 +66,37 @@ namespace Easy.MessageHub
             lock (AllSubscriptions) { return AllSubscriptions.Any(s => s.Token == token); }
         }
 
-        internal static Subscription[] GetTheLatestRevisionOfSubscriptions()
+        internal static Subscription[] GetTheLatestSubscriptions()
         {
-            if (_localSubscriptions == null)
-            {
-                _localSubscriptions = new Subscription[0];
-            }
+            if (_localSubscriptions == null) { _localSubscriptions = new Subscription[0]; }
 
-            if (_localSubscriptionRevision == _subscriptionRevision)
-            {
-                return _localSubscriptions;
-            }
+            var changeCounterLatestCopy = Interlocked.CompareExchange(ref _subscriptionsChangeCounter, 0, 0);
+            if (_localSubscriptionRevision == changeCounterLatestCopy) { return _localSubscriptions; }
 
             Subscription[] latestSubscriptions;
             lock (AllSubscriptions)
             {
                 latestSubscriptions = AllSubscriptions.ToArray();
-                _localSubscriptionRevision = _subscriptionRevision;
             }
 
+            _localSubscriptionRevision = changeCounterLatestCopy;
             _localSubscriptions = latestSubscriptions;
-
-            return latestSubscriptions;
+            return _localSubscriptions;
         }
 
-        internal static void Dispose()
+        internal static void Dispose() => Clear();
+
+        private static T[] RemoveAt<T>(T[] source, int index)
         {
-            Clear();
+            var dest = new T[source.Length - 1];
+            if (index > 0) { Array.Copy(source, 0, dest, 0, index); }
+
+            if (index < source.Length - 1)
+            {
+                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
+            }
+
+            return dest;
         }
     }
 }

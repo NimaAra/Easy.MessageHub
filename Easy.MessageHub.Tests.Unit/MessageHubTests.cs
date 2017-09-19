@@ -32,16 +32,17 @@
             var commandsQueue = new Queue<Command>();
             var ordersQueue = new Queue<Order>();
 
-            Action<Type, object> auditHandler = (type, msg) =>
+
+            void AuditHandler(Type type, object msg)
             {
                 // ReSharper disable once AccessToModifiedClosure
                 if (!isUsageExampleRunning) { return; }
 
                 msg.ShouldBeAssignableTo<MessageBase>();
                 auditQueue.Enqueue((MessageBase) msg);
-            };
+            }
 
-            hub.RegisterGlobalHandler(auditHandler);
+            hub.RegisterGlobalHandler(AuditHandler);
 
             hub.Publish(new MessageBase { Name = "Base" });
 

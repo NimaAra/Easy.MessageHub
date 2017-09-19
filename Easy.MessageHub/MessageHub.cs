@@ -56,7 +56,7 @@
         /// <param name="message">The message to published</param>
         public void Publish<T>(T message)
         {
-            var localSubscriptions = Subscriptions.GetTheLatestRevisionOfSubscriptions();
+            var localSubscriptions = Subscriptions.GetTheLatestSubscriptions();
 
             var msgType = typeof(T);
 
@@ -93,10 +93,7 @@
         /// <typeparam name="T">The type of message to subscribe to</typeparam>
         /// <param name="action">The callback to be invoked once the message is published on the <see cref="MessageHub"/></param>
         /// <returns>The token representing the subscription</returns>
-        public Guid Subscribe<T>(Action<T> action)
-        {
-            return Subscribe(action, TimeSpan.Zero);
-        }
+        public Guid Subscribe<T>(Action<T> action) => Subscribe(action, TimeSpan.Zero);
 
         /// <summary>
         /// Subscribes a callback against the <see cref="MessageHub"/> for a specific type of message.
