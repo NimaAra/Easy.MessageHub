@@ -41,10 +41,10 @@ namespace Easy.MessageHub
                 var removed = AllSubscriptions.Remove(subscription);
                 if (!removed) { return; }
 
-                var localIdx = Array.IndexOf(_localSubscriptions, subscription);
-                if (localIdx >= 0)
+                if (_localSubscriptions != null)
                 {
-                    _localSubscriptions = RemoveAt(_localSubscriptions, localIdx);
+                    var localIdx = Array.IndexOf(_localSubscriptions, subscription);
+                    if (localIdx >= 0) { _localSubscriptions = RemoveAt(_localSubscriptions, localIdx); }
                 }
 
                 _subscriptionsChangeCounter++;
@@ -56,7 +56,7 @@ namespace Easy.MessageHub
             lock (AllSubscriptions)
             {
                 AllSubscriptions.Clear();
-                Array.Clear(_localSubscriptions, 0, _localSubscriptions.Length);
+                if (_localSubscriptions != null) { Array.Clear(_localSubscriptions, 0, _localSubscriptions.Length); }
                 _subscriptionsChangeCounter++;
             }
         }
