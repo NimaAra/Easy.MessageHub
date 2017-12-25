@@ -1,31 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>An implementation of the EventAggregator pattern.</Description>
-    <Summary>Decouples your publishers and subscribers from one another.</Summary>
-    <Copyright>2017 Nima Ara</Copyright>
-    <AssemblyTitle>Easy MessageHub</AssemblyTitle>
-    <VersionPrefix>0.0.0</VersionPrefix>
-    <Authors>Nima Ara</Authors>
-    <TargetFrameworks>net35;netstandard1.0</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Easy.MessageHub</AssemblyName>
     <PackageId>Easy.MessageHub</PackageId>
+    <Description>An implementation of the EventAggregator pattern.</Description>
+    <Authors>Nima Ara</Authors>
+    <Copyright>2017 Nima Ara</Copyright>
     <PackageTags>EventAggregator;MessageHub;Publish;Subscribe</PackageTags>
     <PackageProjectUrl>https://github.com/NimaAra/Easy.MessageHub</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NimaAra/Easy.MessageHub/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>-</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/NimaAra/Easy.MessageHub</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;net35</TargetFrameworks>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
-    <FileVersion>0.0.0.0</FileVersion>
-    <PackageReleaseNotes>-</PackageReleaseNotes>
+    <TargetFrameworks>net35;netstandard1.0</TargetFrameworks>
+    <AssemblyTitle>Easy MessageHub</AssemblyTitle>
+    <AssemblyName>Easy.MessageHub</AssemblyName>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
@@ -43,10 +36,6 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\net35\Easy.MessageHub.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
