@@ -56,7 +56,10 @@ namespace Easy.MessageHub
             lock (AllSubscriptions)
             {
                 AllSubscriptions.Clear();
-                if (_localSubscriptions != null) { Array.Clear(_localSubscriptions, 0, _localSubscriptions.Length); }
+                if (_localSubscriptions != null)
+                {
+                    Array.Clear(_localSubscriptions, 0, _localSubscriptions.Length);
+                }
                 _subscriptionsChangeCounter++;
             }
         }
@@ -83,8 +86,6 @@ namespace Easy.MessageHub
             _localSubscriptions = latestSubscriptions;
             return _localSubscriptions;
         }
-
-        internal static void Dispose() => Clear();
 
         private static T[] RemoveAt<T>(T[] source, int index)
         {

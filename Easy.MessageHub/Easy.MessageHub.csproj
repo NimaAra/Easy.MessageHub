@@ -4,7 +4,7 @@
     <PackageId>Easy.MessageHub</PackageId>
     <Description>An implementation of the EventAggregator pattern.</Description>
     <Authors>Nima Ara</Authors>
-    <Copyright>2017 Nima Ara</Copyright>
+    <Copyright>2018 Nima Ara</Copyright>
     <PackageTags>EventAggregator;MessageHub;Publish;Subscribe</PackageTags>
     <PackageProjectUrl>https://github.com/NimaAra/Easy.MessageHub</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NimaAra/Easy.MessageHub/blob/master/LICENSE</PackageLicenseUrl>

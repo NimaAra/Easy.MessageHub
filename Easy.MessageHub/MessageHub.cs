@@ -2,7 +2,6 @@
 {
     using System;
     using System.Diagnostics;
-    using System.Threading;
 #if NET_STANDARD
     using System.Reflection;
 #endif   
@@ -12,22 +11,14 @@
     /// </summary>
     public sealed class MessageHub : IMessageHub
     {
-    #region Singleton
-        // ReSharper disable once InconsistentNaming
-        private static readonly MessageHub _instance = new MessageHub();
-        static MessageHub() { } // Empty static constructor - forces laziness
-        private MessageHub() { }
-    #endregion
-
-
         private Action<Type, object> _globalHandler;
-        private int _disposed;
+
+        private MessageHub() { }
 
         /// <summary>
         /// Returns a single instance of the <see cref="MessageHub"/>
         /// </summary>
-        // ReSharper disable once ConvertToAutoProperty
-        public static MessageHub Instance => _instance;
+        public static MessageHub Instance { get; } = new MessageHub();
 
         /// <summary>
         /// Invoked if an error occurs when publishing the message to a subscriber.
@@ -45,8 +36,6 @@
         public void RegisterGlobalHandler(Action<Type, object> onMessage)
         {
             EnsureNotNull(onMessage);
-            EnsureNotDisposed();
-
             _globalHandler = onMessage;
         }
 
@@ -105,8 +94,6 @@
         public Guid Subscribe<T>(Action<T> action, TimeSpan throttleBy)
         {
             EnsureNotNull(action);
-            EnsureNotDisposed();
-
             return Subscriptions.Register(throttleBy, action);
         }
 
@@ -114,46 +101,28 @@
         /// Un-Subscribes a subscription from the <see cref="MessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
-        public void UnSubscribe(Guid token)
-        {
-            EnsureNotDisposed();
-            Subscriptions.UnRegister(token);
-        }
+        public void UnSubscribe(Guid token) => Subscriptions.UnRegister(token);
 
         /// <summary>
         /// Checks if a specific subscription is active on the <see cref="MessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
         /// <returns><c>True</c> if the subscription is active otherwise <c>False</c></returns>
-        public bool IsSubscribed(Guid token)
-        {
-            EnsureNotDisposed();
-            return Subscriptions.IsRegistered(token);
-        }
+        public bool IsSubscribed(Guid token) => Subscriptions.IsRegistered(token);
 
         /// <summary>
         /// Clears all the subscriptions from the <see cref="MessageHub"/>.
         /// <remarks>The global handler and the <see cref="OnError"/> are not affected</remarks>
         /// </summary>
-        public void ClearSubscriptions()
-        {
-            EnsureNotDisposed();
-            Subscriptions.Clear();
-        }
+        public void ClearSubscriptions() => Subscriptions.Clear();
 
         /// <summary>
         /// Disposes the <see cref="MessageHub"/>.
         /// </summary>
         public void Dispose()
         {
-            Interlocked.Increment(ref _disposed);
-            Subscriptions.Dispose();
-        }
-
-        [DebuggerStepThrough]
-        private void EnsureNotDisposed()
-        {
-            if (_disposed == 1) { throw new ObjectDisposedException(GetType().Name); }
+            _globalHandler = null;
+            ClearSubscriptions();
         }
 
         [DebuggerStepThrough]
