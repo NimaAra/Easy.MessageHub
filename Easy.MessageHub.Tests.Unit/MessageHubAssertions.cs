@@ -27,37 +27,37 @@
 
         private static void When_publishing_with_no_subscribers()
         {
-            var aggregator = MessageHub.Instance;
-            Should.NotThrow(() => aggregator.Publish(TimeSpan.FromTicks(1234)));
+            var hub = MessageHub.Instance;
+            Should.NotThrow(() => hub.Publish(TimeSpan.FromTicks(1234)));
 
             string result = null;
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
                 result = msg as string;
             });
 
-            aggregator.Publish("654321");
+            hub.Publish("654321");
             result.ShouldBe("654321");
         }
 
         private static void When_unsubscribing_invalid_token()
         {
-            var aggregator = MessageHub.Instance;
-            Should.NotThrow(() => aggregator.Unsubscribe(Guid.NewGuid()));
+            var hub = MessageHub.Instance;
+            Should.NotThrow(() => hub.Unsubscribe(Guid.NewGuid()));
         }
 
         private static void When_subscribing_handlers()
         {
-            var aggregator = MessageHub.Instance;
+            var hub = MessageHub.Instance;
 
             var queue = new ConcurrentQueue<string>();
             Action<string> subscriber = msg => queue.Enqueue(msg);
 
-            aggregator.Subscribe(subscriber);
+            hub.Subscribe(subscriber);
 
-            aggregator.Publish("A");
+            hub.Publish("A");
 
             queue.Count.ShouldBe(1);
 
@@ -127,11 +127,11 @@
 
         private static void When_subscribing_same_handler_multiple_times()
         {
-            var aggregator = MessageHub.Instance;
+            var hub = MessageHub.Instance;
 
             var totalMsgCount = 0;
 
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
@@ -141,13 +141,13 @@
             var queue = new ConcurrentQueue<string>();
             Action<string> subscriber = msg => queue.Enqueue(msg);
 
-            var tokenOne = aggregator.Subscribe(subscriber);
-            var tokenTwo = aggregator.Subscribe(subscriber);
+            var tokenOne = hub.Subscribe(subscriber);
+            var tokenTwo = hub.Subscribe(subscriber);
 
-            aggregator.IsSubscribed(tokenOne);
-            aggregator.IsSubscribed(tokenTwo);
+            hub.IsSubscribed(tokenOne);
+            hub.IsSubscribed(tokenTwo);
 
-            aggregator.Publish("A");
+            hub.Publish("A");
 
             queue.Count.ShouldBe(2);
             totalMsgCount.ShouldBe(1);
@@ -155,105 +155,105 @@
 
         private static void When_creating_multiple_instances_of_the_same_type_of_aggregator()
         {
-            var aggregatorOne = MessageHub.Instance;
-            var aggregatorTwo = MessageHub.Instance;
+            var hub1 = MessageHub.Instance;
+            var hub2 = MessageHub.Instance;
 
-            aggregatorOne.ShouldBeSameAs(aggregatorTwo);
+            hub1.ShouldBeSameAs(hub2);
         }
         
         private static void When_testing_handler_exists()
         {
-            var aggregator = MessageHub.Instance;
-            aggregator.ClearSubscriptions();
+            var hub = MessageHub.Instance;
+            hub.ClearSubscriptions();
 
             Action<string> subscriberOne = msg => { };
-            var tokenOne = aggregator.Subscribe(subscriberOne);
-            aggregator.IsSubscribed(tokenOne).ShouldBeTrue();
+            var tokenOne = hub.Subscribe(subscriberOne);
+            hub.IsSubscribed(tokenOne).ShouldBeTrue();
 
             Action<string> subscriberTwo = msg => { };
-            var tokenTwo = aggregator.Subscribe(subscriberTwo);
-            aggregator.IsSubscribed(tokenTwo).ShouldBeTrue();
+            var tokenTwo = hub.Subscribe(subscriberTwo);
+            hub.IsSubscribed(tokenTwo).ShouldBeTrue();
 
             Action<string> subscriberThree = msg => { };
-            var tokenThree = aggregator.Subscribe(subscriberThree);
-            aggregator.IsSubscribed(tokenThree).ShouldBeTrue();
+            var tokenThree = hub.Subscribe(subscriberThree);
+            hub.IsSubscribed(tokenThree).ShouldBeTrue();
 
             Action<string> subscriberFour = msg => { };
-            var tokenFour = aggregator.Subscribe(subscriberFour);
-            aggregator.IsSubscribed(tokenFour).ShouldBeTrue();
+            var tokenFour = hub.Subscribe(subscriberFour);
+            hub.IsSubscribed(tokenFour).ShouldBeTrue();
 
-            aggregator.Unsubscribe(tokenThree);
-            aggregator.IsSubscribed(tokenThree).ShouldBeFalse();
+            hub.Unsubscribe(tokenThree);
+            hub.IsSubscribed(tokenThree).ShouldBeFalse();
 
-            aggregator.Unsubscribe(tokenFour);
-            aggregator.IsSubscribed(tokenFour).ShouldBeFalse();
+            hub.Unsubscribe(tokenFour);
+            hub.IsSubscribed(tokenFour).ShouldBeFalse();
 
-            aggregator.IsSubscribed(tokenTwo).ShouldBeTrue();
-            aggregator.IsSubscribed(tokenOne).ShouldBeTrue();
+            hub.IsSubscribed(tokenTwo).ShouldBeTrue();
+            hub.IsSubscribed(tokenOne).ShouldBeTrue();
 
-            aggregator.ClearSubscriptions();
+            hub.ClearSubscriptions();
 
-            aggregator.IsSubscribed(tokenOne).ShouldBeFalse();
-            aggregator.IsSubscribed(tokenTwo).ShouldBeFalse();
-            aggregator.IsSubscribed(tokenThree).ShouldBeFalse();
-            aggregator.IsSubscribed(tokenFour).ShouldBeFalse();
+            hub.IsSubscribed(tokenOne).ShouldBeFalse();
+            hub.IsSubscribed(tokenTwo).ShouldBeFalse();
+            hub.IsSubscribed(tokenThree).ShouldBeFalse();
+            hub.IsSubscribed(tokenFour).ShouldBeFalse();
 
             // now let's add back one subscription
-            tokenFour = aggregator.Subscribe(subscriberFour);
-            aggregator.IsSubscribed(tokenFour).ShouldBeTrue();
+            tokenFour = hub.Subscribe(subscriberFour);
+            hub.IsSubscribed(tokenFour).ShouldBeTrue();
         }
 
         private static void When_testing_global_on_message_event()
         {
-            var aggregator = MessageHub.Instance;
-            aggregator.ClearSubscriptions();
+            var hub = MessageHub.Instance;
+            hub.ClearSubscriptions();
 
             var msgOne = 0;
 
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
                 msgOne++;
             });
 
-            aggregator.Publish("A");
+            hub.Publish("A");
 
             msgOne.ShouldBe(1);
 
-            aggregator.ClearSubscriptions();
-            aggregator.Publish("B");
+            hub.ClearSubscriptions();
+            hub.Publish("B");
 
             msgOne.ShouldBe(2);
 
             var msgTwo = 0;
 
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
                 msgTwo++;
             });
 
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
                 msgTwo++;
             });
 
-            aggregator.Publish("C");
+            hub.Publish("C");
 
             msgTwo.ShouldBe(1);
 
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
                 // do nothing with the message
             });
 
-            aggregator.Publish("D");
+            hub.Publish("D");
 
             msgOne.ShouldBe(2, "No handler would increment this value");
             msgTwo.ShouldBe(1, "No handler would increment this value");
@@ -261,20 +261,20 @@
 
         private static void When_testing_single_subscriber_with_publisher_on_current_thread()
         {
-            var aggregator = MessageHub.Instance;
-            aggregator.ClearSubscriptions();
+            var hub = MessageHub.Instance;
+            hub.ClearSubscriptions();
 
             var queue = new List<string>();
 
             Action<string> subscriber = msg => queue.Add(msg);
-            aggregator.Subscribe(subscriber);
+            hub.Subscribe(subscriber);
 
-            aggregator.Publish("MessageA");
+            hub.Publish("MessageA");
 
             queue.Count.ShouldBe(1);
             queue[0].ShouldBe("MessageA");
 
-            aggregator.Publish("MessageB");
+            hub.Publish("MessageB");
 
             queue.Count.ShouldBe(2);
             queue[1].ShouldBe("MessageB");
@@ -282,8 +282,8 @@
 
         private static void When_testing_multiple_subscribers_with_publisher_on_current_thread()
         {
-            var aggregator = MessageHub.Instance;
-            aggregator.ClearSubscriptions();
+            var hub = MessageHub.Instance;
+            hub.ClearSubscriptions();
 
             var queueOne = new List<string>();
             var queueTwo = new List<string>();
@@ -291,10 +291,10 @@
             Action<string> subscriberOne = msg => queueOne.Add("Sub1-" + msg);
             Action<string> subscriberTwo = msg => queueTwo.Add("Sub2-" + msg);
 
-            aggregator.Subscribe(subscriberOne);
-            aggregator.Subscribe(subscriberTwo);
+            hub.Subscribe(subscriberOne);
+            hub.Subscribe(subscriberTwo);
 
-            aggregator.Publish("MessageA");
+            hub.Publish("MessageA");
 
             queueOne.Count.ShouldBe(1);
             queueTwo.Count.ShouldBe(1);
@@ -302,7 +302,7 @@
             queueOne[0].ShouldBe("Sub1-MessageA");
             queueTwo[0].ShouldBe("Sub2-MessageA");
 
-            aggregator.Publish("MessageB");
+            hub.Publish("MessageB");
 
             queueOne.Count.ShouldBe(2);
             queueTwo.Count.ShouldBe(2);
@@ -313,8 +313,8 @@
 
         private static void When_testing_multiple_subscribers_with_filters_and_publisher_on_current_thread()
         {
-            var aggregator = MessageHub.Instance;
-            aggregator.ClearSubscriptions();
+            var hub = MessageHub.Instance;
+            hub.ClearSubscriptions();
 
             var queueOne = new List<string>();
             var queueTwo = new List<string>();
@@ -338,33 +338,33 @@
                 }
             };
 
-            aggregator.Subscribe(subscriberOne);
-            aggregator.Subscribe(subscriberTwo);
+            hub.Subscribe(subscriberOne);
+            hub.Subscribe(subscriberTwo);
 
-            aggregator.Publish("MessageA");
+            hub.Publish("MessageA");
 
             queueOne.Count.ShouldBe(1);
             queueTwo.Count.ShouldBe(0);
             queueOne[0].ShouldBe("Sub1-MessageA");
 
-            aggregator.Publish("MA");
+            hub.Publish("MA");
 
             queueTwo.Count.ShouldBe(1);
             queueOne.Count.ShouldBe(1);
             queueTwo[0].ShouldBe("Sub2-MA");
 
-            aggregator.Publish("MMM");
+            hub.Publish("MMM");
 
             queueOne.Count.ShouldBe(1);
             queueTwo.Count.ShouldBe(1);
 
-            aggregator.Publish("MessageB");
+            hub.Publish("MessageB");
 
             queueOne.Count.ShouldBe(2);
             queueTwo.Count.ShouldBe(1);
             queueOne[1].ShouldBe("Sub1-MessageB");
 
-            aggregator.Publish("MB");
+            hub.Publish("MB");
 
             queueTwo.Count.ShouldBe(2);
             queueOne.Count.ShouldBe(2);
@@ -374,10 +374,10 @@
         private static void When_testing_multiple_subscribers_with_one_subscriber_unsubscribing_then_resubscribing()
         {
             var totalMessages = 0;
-            var aggregator = MessageHub.Instance;
-            aggregator.ClearSubscriptions();
+            var hub = MessageHub.Instance;
+            hub.ClearSubscriptions();
 
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
@@ -389,25 +389,25 @@
             Action<string> subscriberOne = msg => queue.Add("Sub1-" + msg);
             Action<string> subscriberTwo = msg => queue.Add("Sub2-" + msg);
 
-            var tokenOne = aggregator.Subscribe(subscriberOne);
-            aggregator.Subscribe(subscriberTwo);
+            var tokenOne = hub.Subscribe(subscriberOne);
+            hub.Subscribe(subscriberTwo);
 
-            aggregator.Publish("A");
+            hub.Publish("A");
 
             queue.Count.ShouldBe(2);
             queue[0].ShouldBe("Sub1-A");
             queue[1].ShouldBe("Sub2-A");
 
-            aggregator.Unsubscribe(tokenOne);
+            hub.Unsubscribe(tokenOne);
 
-            aggregator.Publish("B");
+            hub.Publish("B");
 
             queue.Count.ShouldBe(3);
             queue[2].ShouldBe("Sub2-B");
 
-            aggregator.Subscribe(subscriberOne);
+            hub.Subscribe(subscriberOne);
 
-            aggregator.Publish("C");
+            hub.Publish("C");
 
             queue.Count.ShouldBe(5);
             queue[3].ShouldBe("Sub2-C");
@@ -420,8 +420,8 @@
         private static void When_operating_on_a_disposed_hub()
         {
             var totalMessages = 0;
-            var aggregator = MessageHub.Instance;
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            var hub = MessageHub.Instance;
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
@@ -432,14 +432,14 @@
 
             Action<string> handler = msg => queue.Enqueue(msg);
 
-            var token = aggregator.Subscribe(handler);
+            var token = hub.Subscribe(handler);
 
-            aggregator.Dispose();
+            hub.Dispose();
 
-            Should.NotThrow(() => aggregator.Subscribe(handler));
-            Should.NotThrow(() => aggregator.Unsubscribe(token));
-            Should.NotThrow(() => aggregator.IsSubscribed(token));
-            Should.NotThrow(() => aggregator.ClearSubscriptions());
+            Should.NotThrow(() => hub.Subscribe(handler));
+            Should.NotThrow(() => hub.Unsubscribe(token));
+            Should.NotThrow(() => hub.IsSubscribed(token));
+            Should.NotThrow(() => hub.ClearSubscriptions());
 
             totalMessages.ShouldBe(0);
         }
