@@ -12,6 +12,7 @@
     public sealed class MessageHub : IMessageHub
     {
         private Action<Type, object> _globalHandler;
+        private Action<Guid, Exception> _globalErrorHandler;
 
         private MessageHub() { }
 
@@ -19,11 +20,6 @@
         /// Returns a single instance of the <see cref="MessageHub"/>
         /// </summary>
         public static MessageHub Instance { get; } = new MessageHub();
-
-        /// <summary>
-        /// Invoked if an error occurs when publishing the message to a subscriber.
-        /// </summary>
-        public event EventHandler<MessageHubErrorEventArgs> OnError;
 
         /// <summary>
         /// Registers a callback which is invoked on every message published by the <see cref="MessageHub"/>.
@@ -37,6 +33,15 @@
         {
             EnsureNotNull(onMessage);
             _globalHandler = onMessage;
+        }
+
+        /// <summary>
+        /// Invoked if an error occurs when publishing a message to a subscriber.
+        /// </summary>
+        public void RegisterGlobalErrorHandler(Action<Guid, Exception> onError)
+        {
+            EnsureNotNull(onError);
+            _globalErrorHandler = onError;
         }
 
         /// <summary>
@@ -70,8 +75,7 @@
                 }
                 catch (Exception e)
                 {
-                    var copy = OnError;
-                    copy?.Invoke(this, new MessageHubErrorEventArgs(e, subscription.Token));
+                    _globalErrorHandler?.Invoke(subscription.Token, e);
                 }
             }
         }
@@ -98,10 +102,10 @@
         }
 
         /// <summary>
-        /// Un-Subscribes a subscription from the <see cref="MessageHub"/>.
+        /// Unsubscribes a subscription from the <see cref="MessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
-        public void UnSubscribe(Guid token) => Subscriptions.UnRegister(token);
+        public void Unsubscribe(Guid token) => Subscriptions.UnRegister(token);
 
         /// <summary>
         /// Checks if a specific subscription is active on the <see cref="MessageHub"/>.
@@ -112,7 +116,7 @@
 
         /// <summary>
         /// Clears all the subscriptions from the <see cref="MessageHub"/>.
-        /// <remarks>The global handler and the <see cref="OnError"/> are not affected</remarks>
+        /// <remarks>The global handler and the global error handler are not affected</remarks>
         /// </summary>
         public void ClearSubscriptions() => Subscriptions.Clear();
 

@@ -11,7 +11,7 @@
         public static void Run()
         {
             When_publishing_with_no_subscribers();
-            When_un_subscribing_invalid_token();
+            When_unsubscribing_invalid_token();
             When_subscribing_handlers();
             When_subscribing_same_handler_multiple_times();
             When_creating_multiple_instances_of_the_same_type_of_aggregator();
@@ -42,10 +42,10 @@
             result.ShouldBe("654321");
         }
 
-        private static void When_un_subscribing_invalid_token()
+        private static void When_unsubscribing_invalid_token()
         {
             var aggregator = MessageHub.Instance;
-            Should.NotThrow(() => aggregator.UnSubscribe(Guid.NewGuid()));
+            Should.NotThrow(() => aggregator.Unsubscribe(Guid.NewGuid()));
         }
 
         private static void When_subscribing_handlers()
@@ -68,34 +68,35 @@
 
         private static void When_subscribing_handlers_with_one_throwing_exception()
         {
-            var aggregator = MessageHub.Instance;
+            var hub = MessageHub.Instance;
 
             var queue = new List<string>();
             var totalMsgs = new List<string>();
-            var errors = new List<MessageHubErrorEventArgs>();
+            var errors = new List<KeyValuePair<Guid, Exception>>();
 
-            aggregator.RegisterGlobalHandler((type, msg) =>
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 type.ShouldBe(typeof(string));
                 msg.ShouldBeOfType<string>();
                 totalMsgs.Add((string)msg);
             });
 
-            aggregator.OnError += (sender, e) => errors.Add(e);
-
+            hub.RegisterGlobalErrorHandler(
+                (token, e) => errors.Add(new KeyValuePair<Guid, Exception>(token, e)));
+            
             Action<string> subscriberOne = msg => queue.Add("Sub1-" + msg);
             Action<string> subscriberTwo = msg => { throw new InvalidOperationException("Ooops-" + msg); };
             Action<string> subscriberThree = msg => queue.Add("Sub3-" + msg);
 
-            aggregator.Subscribe(subscriberOne);
-            var subTwoToken = aggregator.Subscribe(subscriberTwo);
-            aggregator.Subscribe(subscriberThree);
-            aggregator.Publish("A");
+            hub.Subscribe(subscriberOne);
+            var subTwoToken = hub.Subscribe(subscriberTwo);
+            hub.Subscribe(subscriberThree);
+            hub.Publish("A");
 
             Action<string> subscriberFour = msg => { throw new InvalidCastException("Aaargh-" + msg); };
-            var subFourToken = aggregator.Subscribe(subscriberFour);
+            var subFourToken = hub.Subscribe(subscriberFour);
 
-            aggregator.Publish("B");
+            hub.Publish("B");
 
             queue.Count.ShouldBe(4);
             queue[0].ShouldBe("Sub1-A");
@@ -109,19 +110,19 @@
 
             errors.Count.ShouldBe(3);
             errors.ShouldContain(err =>
-                err.Exception.GetType() == typeof(InvalidOperationException)
-                && err.Exception.Message == "Ooops-A"
-                && err.Token == subTwoToken);
+                err.Value.GetType() == typeof(InvalidOperationException)
+                && err.Value.Message == "Ooops-A"
+                && err.Key == subTwoToken);
 
             errors.ShouldContain(err =>
-                err.Exception.GetType() == typeof(InvalidOperationException)
-                && err.Exception.Message == "Ooops-B"
-                && err.Token == subTwoToken);
+                err.Value.GetType() == typeof(InvalidOperationException)
+                && err.Value.Message == "Ooops-B"
+                && err.Key == subTwoToken);
 
             errors.ShouldContain(err =>
-                err.Exception.GetType() == typeof(InvalidCastException)
-                && err.Exception.Message == "Aaargh-B"
-                && err.Token == subFourToken);
+                err.Value.GetType() == typeof(InvalidCastException)
+                && err.Value.Message == "Aaargh-B"
+                && err.Key == subFourToken);
         }
 
         private static void When_subscribing_same_handler_multiple_times()
@@ -181,10 +182,10 @@
             var tokenFour = aggregator.Subscribe(subscriberFour);
             aggregator.IsSubscribed(tokenFour).ShouldBeTrue();
 
-            aggregator.UnSubscribe(tokenThree);
+            aggregator.Unsubscribe(tokenThree);
             aggregator.IsSubscribed(tokenThree).ShouldBeFalse();
 
-            aggregator.UnSubscribe(tokenFour);
+            aggregator.Unsubscribe(tokenFour);
             aggregator.IsSubscribed(tokenFour).ShouldBeFalse();
 
             aggregator.IsSubscribed(tokenTwo).ShouldBeTrue();
@@ -397,7 +398,7 @@
             queue[0].ShouldBe("Sub1-A");
             queue[1].ShouldBe("Sub2-A");
 
-            aggregator.UnSubscribe(tokenOne);
+            aggregator.Unsubscribe(tokenOne);
 
             aggregator.Publish("B");
 
@@ -436,7 +437,7 @@
             aggregator.Dispose();
 
             Should.NotThrow(() => aggregator.Subscribe(handler));
-            Should.NotThrow(() => aggregator.UnSubscribe(token));
+            Should.NotThrow(() => aggregator.Unsubscribe(token));
             Should.NotThrow(() => aggregator.IsSubscribed(token));
             Should.NotThrow(() => aggregator.ClearSubscriptions());
 

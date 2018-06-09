@@ -8,11 +8,6 @@
     public interface IMessageHub : IDisposable
     {
         /// <summary>
-        /// Invoked if an error occurs when publishing the message to a subscriber.
-        /// </summary>
-        event EventHandler<MessageHubErrorEventArgs> OnError;
-
-        /// <summary>
         /// Registers a callback which is invoked on every message published by the <see cref="IMessageHub"/>.
         /// <remarks>Invoking this method with a new <paramref name="onMessage"/>overwrites the previous one.</remarks>
         /// </summary>
@@ -21,6 +16,11 @@
         /// <remarks>The callback receives the type of the message and the message as arguments</remarks>
         /// </param>
         void RegisterGlobalHandler(Action<Type, object> onMessage);
+
+        /// <summary>
+        /// Invoked if an error occurs when publishing a message to a subscriber.
+        /// </summary>
+        void RegisterGlobalErrorHandler(Action<Guid, Exception> onError);
 
         /// <summary>
         /// Publishes the <paramref name="message"/> on the <see cref="IMessageHub"/>.
@@ -46,10 +46,10 @@
         Guid Subscribe<T>(Action<T> action, TimeSpan throttleBy);
 
         /// <summary>
-        /// Un-Subscribes a subscription from the <see cref="IMessageHub"/>.
+        /// Unsubscribes a subscription from the <see cref="IMessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
-        void UnSubscribe(Guid token);
+        void Unsubscribe(Guid token);
 
         /// <summary>
         /// Checks if a specific subscription is active on the <see cref="IMessageHub"/>.
@@ -59,8 +59,8 @@
         bool IsSubscribed(Guid token);
 
         /// <summary>
-        /// Clears all the subscriptions from the <see cref="IMessageHub"/>.
-        /// <remarks>The global handler and the <see cref="OnError"/> are not affected</remarks>
+        /// Clears all the subscriptions from the <see cref="MessageHub"/>.
+        /// <remarks>The global handler and the global error handler are not affected</remarks>
         /// </summary>
         void ClearSubscriptions();
     }

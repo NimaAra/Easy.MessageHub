@@ -23,15 +23,15 @@
             // multiple assertions each with their own GlobalHandler registered to pass
             var isUsageExampleRunning = true;
 
-            var errors = new Queue<MessageHubErrorEventArgs>();
-            hub.OnError += (sender, args) => errors.Enqueue(args);
+            var errors = new Queue<KeyValuePair<Guid, Exception>>();
+            hub.RegisterGlobalErrorHandler(
+                (token, e) => errors.Enqueue(new KeyValuePair<Guid, Exception>(token, e)));
 
             var auditQueue = new Queue<MessageBase>();
 
             var allMessagesQueue = new Queue<MessageBase>();
             var commandsQueue = new Queue<Command>();
             var ordersQueue = new Queue<Order>();
-
 
             void AuditHandler(Type type, object msg)
             {
@@ -152,23 +152,8 @@
         public string Name { get; set; }
     }
 
-    internal class Command : MessageBase
-    {
-
-    }
-
-    internal sealed class OpenCommand : Command
-    {
-
-    }
-
-    internal sealed class CloseCommand : Command
-    {
-
-    }
-
-    internal sealed class Order : MessageBase
-    {
-
-    }
+    internal class Command : MessageBase {}
+    internal sealed class OpenCommand : Command {}
+    internal sealed class CloseCommand : Command {}
+    internal sealed class Order : MessageBase {}
 }

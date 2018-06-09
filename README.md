@@ -33,7 +33,7 @@ You can then use the token to do:
 
 ```csharp
 hub.IsSubscribed(token); // returns true
-hub.UnSubscribe(token);
+hub.Unsubscribe(token);
 hub.IsSubscribed(token); // returns false
 ```
 Or you can clear all subscriptions by:
@@ -48,10 +48,9 @@ hub.Publish("An important message");
 ```
 
 #### Error handling:
-The hub catches any exception thrown at the time of publication and exposes them by:
+The hub catches any exception thrown at the time of publication and exposes them via:
 ```csharp
-hub.OnError += (sender, eArgs)
-        => Console.WriteLine($"Error Publishing, Token: {eArgs.Token} | Exception: {eArgs.Exception}");
+hub.RegisterGlobalErrorHandler((token, e) => Console.WriteLine($"Error Publishing, Token: {token} | Exception: {e}"));
 ```
 
 #### Global handler:
@@ -65,9 +64,7 @@ hub.RegisterGlobalHandler((type, eventObject) => Console.WriteLine($"Type: {type
 The hub allows each subscriber to throttle the rate at which it receives the events:
 
 ```csharp
-hub.Subscribe<string>(msg => 
-	Console.WriteLine($"Message is: {msg}"), 
-	TimeSpan.FromSeconds(1));
+hub.Subscribe<string>(msg => Console.WriteLine($"Message is: {msg}"), TimeSpan.FromSeconds(1));
 ```
 In the above example, if the subscriber receives more than one message within _1_ second of another, it drops them.
 
