@@ -14,7 +14,7 @@
             When_unsubscribing_invalid_token();
             When_subscribing_handlers();
             When_subscribing_same_handler_multiple_times();
-            When_creating_multiple_instances_of_the_same_type_of_aggregator();
+            When_creating_multiple_instances_of_the_same_type_of_hub();
             When_subscribing_handlers_with_one_throwing_exception();
             When_testing_global_on_message_event();
             When_testing_single_subscriber_with_publisher_on_current_thread();
@@ -153,7 +153,7 @@
             totalMsgCount.ShouldBe(1);
         }
 
-        private static void When_creating_multiple_instances_of_the_same_type_of_aggregator()
+        private static void When_creating_multiple_instances_of_the_same_type_of_hub()
         {
             var hub1 = MessageHub.Instance;
             var hub2 = MessageHub.Instance;
