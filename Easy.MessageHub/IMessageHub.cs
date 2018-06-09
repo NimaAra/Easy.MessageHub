@@ -19,6 +19,7 @@
 
         /// <summary>
         /// Invoked if an error occurs when publishing a message to a subscriber.
+        /// <remarks>Invoking this method with a new <paramref name="onError"/>overwrites the previous one.</remarks>
         /// </summary>
         void RegisterGlobalErrorHandler(Action<Guid, Exception> onError);
 
