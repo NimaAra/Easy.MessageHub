@@ -12,6 +12,7 @@ Supports _.Net Core_ (_.Net 3.5_ & _netstandard1.0_) running on:
 * Windows Phone 8.1
 * Windows Phone Seilverlight 8.0
 
+##### If you enjoy what I build then please <a href="https://www.buymeacoffee.com/sP0BhM9n6" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" width="120px" ></a> :-)
 ___
 
 
