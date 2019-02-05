@@ -4,10 +4,10 @@
     <PackageId>Easy.MessageHub</PackageId>
     <Description>An implementation of the EventAggregator pattern.</Description>
     <Authors>Nima Ara</Authors>
-    <Copyright>2018 Nima Ara</Copyright>
+    <Copyright>2019 Nima Ara</Copyright>
     <PackageTags>EventAggregator;MessageHub;Publish;Subscribe</PackageTags>
     <PackageProjectUrl>https://github.com/NimaAra/Easy.MessageHub</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/NimaAra/Easy.MessageHub/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>-</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/NimaAra/Easy.MessageHub</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -15,20 +15,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>net35;netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.0</TargetFrameworks>
     <AssemblyTitle>Easy MessageHub</AssemblyTitle>
     <AssemblyName>Easy.MessageHub</AssemblyName>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <!-- This is a workaround for: https://github.com/Microsoft/msbuild/issues/1333 -->
-    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
-  </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
     <DefineConstants>$(DefineConstants);NET_STANDARD</DefineConstants>

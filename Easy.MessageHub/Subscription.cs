@@ -21,12 +21,10 @@ namespace Easy.MessageHub
         {
             if (!CanHandle()) { return; }
 
-            var handler = Handler as Action<T>;
-            // ReSharper disable once PossibleNullReferenceException
-            handler(message);
+            ((Action<T>)Handler)(message);
         }
 
-        internal bool CanHandle()
+        private bool CanHandle()
         {
             if (_throttleByTicks == 0) { return true; }
 

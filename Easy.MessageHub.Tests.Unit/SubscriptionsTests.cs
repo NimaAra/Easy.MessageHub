@@ -11,42 +11,45 @@
         public void When_subscribing_value_type()
         {
             Action<int> action = n => { };
-            var key = Subscriptions.Register(TimeSpan.Zero, action);
+            
+            var subs = new Subscriptions();
+
+            var key = subs.Register(TimeSpan.Zero, action);
             key.ShouldNotBeNull();
 
-            Subscriptions.IsRegistered(Guid.NewGuid()).ShouldBeFalse();
-            Subscriptions.IsRegistered(key).ShouldBeTrue();
-            Subscriptions.UnRegister(key);
-            Subscriptions.IsRegistered(key).ShouldBeFalse();
+            subs.IsRegistered(Guid.NewGuid()).ShouldBeFalse();
+            subs.IsRegistered(key).ShouldBeTrue();
+            subs.UnRegister(key);
+            subs.IsRegistered(key).ShouldBeFalse();
 
-            var newKey = Subscriptions.Register(TimeSpan.Zero, action);
-            Subscriptions.IsRegistered(newKey).ShouldBeTrue();
-            Subscriptions.Clear();
-            Subscriptions.IsRegistered(newKey).ShouldBeFalse();
+            var newKey = subs.Register(TimeSpan.Zero, action);
+            subs.IsRegistered(newKey).ShouldBeTrue();
+            subs.Clear(false);
+            subs.IsRegistered(newKey).ShouldBeFalse();
 
-            var subscriptionsSnapshotMain = Subscriptions.GetTheLatestSubscriptions();
-            subscriptionsSnapshotMain.Length.ShouldBe(0);
+            var subscriptionsSnapshotMain = subs.GetTheLatestSubscriptions();
+            subscriptionsSnapshotMain.Count.ShouldBe(0);
 
-            var keyA = Subscriptions.Register(TimeSpan.Zero, action);
-            var subscriptionsSnapshotA = Subscriptions.GetTheLatestSubscriptions();
-            subscriptionsSnapshotA.Length.ShouldBe(1);
+            var keyA = subs.Register(TimeSpan.Zero, action);
+            var subscriptionsSnapshotA = subs.GetTheLatestSubscriptions();
+            subscriptionsSnapshotA.Count.ShouldBe(1);
 
-            var keyB = Subscriptions.Register(TimeSpan.Zero, action);
-            var subscriptionsSnapshotB = Subscriptions.GetTheLatestSubscriptions();
-            subscriptionsSnapshotB.Length.ShouldBe(2);
+            var keyB = subs.Register(TimeSpan.Zero, action);
+            var subscriptionsSnapshotB = subs.GetTheLatestSubscriptions();
+            subscriptionsSnapshotB.Count.ShouldBe(2);
 
-            Subscriptions.IsRegistered(keyA).ShouldBeTrue();
-            var subscriptionsSnapshotC = Subscriptions.GetTheLatestSubscriptions();
-            subscriptionsSnapshotC.Length.ShouldBe(2);
+            subs.IsRegistered(keyA).ShouldBeTrue();
+            var subscriptionsSnapshotC = subs.GetTheLatestSubscriptions();
+            subscriptionsSnapshotC.Count.ShouldBe(2);
             subscriptionsSnapshotC.ShouldBeSameAs(subscriptionsSnapshotB);
 
-            Subscriptions.UnRegister(keyB);
-            var subscriptionsSnapshotD = Subscriptions.GetTheLatestSubscriptions();
-            subscriptionsSnapshotD.Length.ShouldBe(1);
+            subs.UnRegister(keyB);
+            var subscriptionsSnapshotD = subs.GetTheLatestSubscriptions();
+            subscriptionsSnapshotD.Count.ShouldBe(1);
 
-            Subscriptions.Clear();
-            var subscriptionsSnapshotE = Subscriptions.GetTheLatestSubscriptions();
-            subscriptionsSnapshotE.Length.ShouldBe(0);
+            subs.Clear(false);
+            var subscriptionsSnapshotE = subs.GetTheLatestSubscriptions();
+            subscriptionsSnapshotE.Count.ShouldBe(0);
         }
     }
 }

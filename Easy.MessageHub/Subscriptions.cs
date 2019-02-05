@@ -2,21 +2,25 @@ namespace Easy.MessageHub
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
 
-    internal static class Subscriptions
+    [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
+    internal class Subscriptions
     {
-        private static readonly List<Subscription> AllSubscriptions = new List<Subscription>();
-        private static int _subscriptionsChangeCounter;
+        private readonly List<Subscription> AllSubscriptions = new List<Subscription>();
+        private int _subscriptionsChangeCounter;
 
-        [ThreadStatic]
-        private static int _localSubscriptionRevision;
+        private readonly ThreadLocal<int> _localSubscriptionRevision = 
+            new ThreadLocal<int>(() => 0, true);
 
-        [ThreadStatic]
-        private static Subscription[] _localSubscriptions;
+        private readonly ThreadLocal<List<Subscription>> _localSubscriptions = 
+            new ThreadLocal<List<Subscription>>(() => new List<Subscription>(), true);
 
-        internal static Guid Register<T>(TimeSpan throttleBy, Action<T> action)
+        private bool _disposed;
+
+        internal Guid Register<T>(TimeSpan throttleBy, Action<T> action)
         {
             var type = typeof(T);
             var key = Guid.NewGuid();
@@ -27,77 +31,86 @@ namespace Easy.MessageHub
                 AllSubscriptions.Add(subscription);
                 _subscriptionsChangeCounter++;
             }
-
+            
             return key;
         }
 
-        internal static void UnRegister(Guid token)
+        internal void UnRegister(Guid token)
         {
             lock (AllSubscriptions)
             {
-                var subscription = AllSubscriptions.Find(s => s.Token == token);
-                if (subscription == null) { return; }
+                var idx = AllSubscriptions.FindIndex(s => s.Token == token);
+                
+                if (idx < 0) { return; }
 
-                var removed = AllSubscriptions.Remove(subscription);
-                if (!removed) { return; }
+                var subscription = AllSubscriptions[idx];
 
-                if (_localSubscriptions != null)
+                AllSubscriptions.RemoveAt(idx);
+
+                for (var i = 0; i < _localSubscriptions.Values.Count; i++)
                 {
-                    var localIdx = Array.IndexOf(_localSubscriptions, subscription);
-                    if (localIdx >= 0) { _localSubscriptions = RemoveAt(_localSubscriptions, localIdx); }
-                }
+                    var threadLocal = _localSubscriptions.Values[i];
+                    var localIdx = threadLocal.IndexOf(subscription);
+                    if (localIdx < 0) { continue; }
 
+                    threadLocal.RemoveAt(localIdx);
+                    break;
+                }
+                
                 _subscriptionsChangeCounter++;
             }
         }
 
-        internal static void Clear()
+        internal void Clear(bool dispose)
         {
             lock (AllSubscriptions)
             {
+                if (_disposed) { return; }
+                
                 AllSubscriptions.Clear();
-                if (_localSubscriptions != null)
+
+                for (var i = 0; i < _localSubscriptions.Values.Count; i++)
                 {
-                    Array.Clear(_localSubscriptions, 0, _localSubscriptions.Length);
+                    _localSubscriptions.Values[i].Clear();
                 }
-                _subscriptionsChangeCounter++;
+
+                if (dispose)
+                {
+                    _localSubscriptionRevision.Dispose();
+                    _localSubscriptions.Dispose();
+                    _disposed = true;
+                } 
+                else 
+                {
+                    _subscriptionsChangeCounter++;
+                }
             }
         }
 
-        internal static bool IsRegistered(Guid token)
+        internal bool IsRegistered(Guid token)
         {
             lock (AllSubscriptions) { return AllSubscriptions.Any(s => s.Token == token); }
         }
 
-        internal static Subscription[] GetTheLatestSubscriptions()
+        internal List<Subscription> GetTheLatestSubscriptions()
         {
-            if (_localSubscriptions == null) { _localSubscriptions = new Subscription[0]; }
+            var changeCounterLatestCopy = Interlocked.CompareExchange(
+                ref _subscriptionsChangeCounter, 0, 0);
+            
+            if (_localSubscriptionRevision.Value == changeCounterLatestCopy)
+            {
+                return _localSubscriptions.Value;
+            }
 
-            var changeCounterLatestCopy = Interlocked.CompareExchange(ref _subscriptionsChangeCounter, 0, 0);
-            if (_localSubscriptionRevision == changeCounterLatestCopy) { return _localSubscriptions; }
-
-            Subscription[] latestSubscriptions;
+            List<Subscription> latestSubscriptions;
             lock (AllSubscriptions)
             {
-                latestSubscriptions = AllSubscriptions.ToArray();
+                latestSubscriptions = AllSubscriptions.ToList();
             }
 
-            _localSubscriptionRevision = changeCounterLatestCopy;
-            _localSubscriptions = latestSubscriptions;
-            return _localSubscriptions;
-        }
-
-        private static T[] RemoveAt<T>(T[] source, int index)
-        {
-            var dest = new T[source.Length - 1];
-            if (index > 0) { Array.Copy(source, 0, dest, 0, index); }
-
-            if (index < source.Length - 1)
-            {
-                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
-            }
-
-            return dest;
+            _localSubscriptionRevision.Value = changeCounterLatestCopy;
+            _localSubscriptions.Value = latestSubscriptions;
+            return _localSubscriptions.Value;
         }
     }
 }

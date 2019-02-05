@@ -11,10 +11,11 @@
     /// </summary>
     public sealed class MessageHub : IMessageHub
     {
+        private readonly Subscriptions _subscriptions;
         private Action<Type, object> _globalHandler;
         private Action<Guid, Exception> _globalErrorHandler;
 
-        private MessageHub() { }
+        private MessageHub() => _subscriptions = new Subscriptions();
 
         /// <summary>
         /// Returns a single instance of the <see cref="MessageHub"/>
@@ -51,7 +52,7 @@
         /// <param name="message">The message to published</param>
         public void Publish<T>(T message)
         {
-            var localSubscriptions = Subscriptions.GetTheLatestSubscriptions();
+            var localSubscriptions = _subscriptions.GetTheLatestSubscriptions();
 
             var msgType = typeof(T);
 
@@ -61,7 +62,7 @@
             _globalHandler?.Invoke(msgType, message);
 
             // ReSharper disable once ForCanBeConvertedToForeach | Performance Critical
-            for (var idx = 0; idx < localSubscriptions.Length; idx++)
+            for (var idx = 0; idx < localSubscriptions.Count; idx++)
             {
                 var subscription = localSubscriptions[idx];
 
@@ -99,27 +100,27 @@
         public Guid Subscribe<T>(Action<T> action, TimeSpan throttleBy)
         {
             EnsureNotNull(action);
-            return Subscriptions.Register(throttleBy, action);
+            return _subscriptions.Register(throttleBy, action);
         }
 
         /// <summary>
         /// Unsubscribes a subscription from the <see cref="MessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
-        public void Unsubscribe(Guid token) => Subscriptions.UnRegister(token);
+        public void Unsubscribe(Guid token) => _subscriptions.UnRegister(token);
 
         /// <summary>
         /// Checks if a specific subscription is active on the <see cref="MessageHub"/>.
         /// </summary>
         /// <param name="token">The token representing the subscription</param>
         /// <returns><c>True</c> if the subscription is active otherwise <c>False</c></returns>
-        public bool IsSubscribed(Guid token) => Subscriptions.IsRegistered(token);
+        public bool IsSubscribed(Guid token) => _subscriptions.IsRegistered(token);
 
         /// <summary>
         /// Clears all the subscriptions from the <see cref="MessageHub"/>.
         /// <remarks>The global handler and the global error handler are not affected</remarks>
         /// </summary>
-        public void ClearSubscriptions() => Subscriptions.Clear();
+        public void ClearSubscriptions() => _subscriptions.Clear(false);
 
         /// <summary>
         /// Disposes the <see cref="MessageHub"/>.
@@ -127,7 +128,7 @@
         public void Dispose()
         {
             _globalHandler = null;
-            ClearSubscriptions();
+            _subscriptions.Clear(true);
         }
 
         [DebuggerStepThrough]
