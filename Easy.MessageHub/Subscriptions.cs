@@ -54,7 +54,6 @@ namespace Easy.MessageHub
                     if (localIdx < 0) { continue; }
 
                     threadLocal.RemoveAt(localIdx);
-                    break;
                 }
                 
                 _subscriptionsChangeCounter++;
