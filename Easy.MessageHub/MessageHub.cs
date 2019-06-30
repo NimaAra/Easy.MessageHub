@@ -15,12 +15,10 @@
         private Action<Type, object> _globalHandler;
         private Action<Guid, Exception> _globalErrorHandler;
 
-        private MessageHub() => _subscriptions = new Subscriptions();
-
         /// <summary>
-        /// Returns a single instance of the <see cref="MessageHub"/>
+        /// Creates an instance of the <see cref="MessageHub"/>.
         /// </summary>
-        public static MessageHub Instance { get; } = new MessageHub();
+        public MessageHub() => _subscriptions = new Subscriptions();
 
         /// <summary>
         /// Registers a callback which is invoked on every message published by the <see cref="MessageHub"/>.
@@ -128,13 +126,14 @@
         public void Dispose()
         {
             _globalHandler = null;
+            _globalErrorHandler = null;
             _subscriptions.Clear(true);
         }
 
         [DebuggerStepThrough]
         private void EnsureNotNull(object obj)
         {
-            if (obj == null) { throw new NullReferenceException(nameof(obj)); }
+            if (obj is null) { throw new NullReferenceException(nameof(obj)); }
         }
     }
 }

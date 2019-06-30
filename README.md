@@ -18,9 +18,9 @@ ___
 
 ### Usage example:
 
-Start by getting the singleton instance of the hub:
+Start by creating an instance of the hub:
 ```csharp
-var hub = MessageHub.Instance;
+var hub = new MessageHub();
 ```
 
 You can now use the hub to subscribe to any publication of a given type:
