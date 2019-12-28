@@ -20,15 +20,15 @@ ___
 
 Start by creating an instance of the hub:
 ```csharp
-var hub = new MessageHub();
+IMessageHub hub = new MessageHub();
 ```
 
 You can now use the hub to subscribe to any publication of a given type:
 ```csharp
-var token = hub.Subscribe<Person>(p => Console.WriteLine($"Id is: {p.Id}"));
+Guid token = hub.Subscribe<Person>(p => Console.WriteLine($"Id is: {p.Id}"));
 // or    
 Action<string> action = message => Console.WriteLine($"Message is: {message}");
-var anotherToken = hub.Subscribe(action);
+Guid anotherToken = hub.Subscribe(action);
 ```
 You can then use the token to do:
 
