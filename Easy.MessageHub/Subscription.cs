@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Easy.MessageHub
 {
     using System;
@@ -22,6 +24,13 @@ namespace Easy.MessageHub
             if (!CanHandle()) { return; }
 
             ((Action<T>)Handler)(message);
+        }
+
+        internal async Task HandleAsync<T>(T message)
+        {
+            if (!CanHandle()) { return; }
+
+            await ((Func<T, Task>)Handler)(message);
         }
 
         private bool CanHandle()

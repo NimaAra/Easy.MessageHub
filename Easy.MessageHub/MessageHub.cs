@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Threading.Tasks;
 #if NET_STANDARD
     using System.Reflection;
 #endif   
@@ -81,12 +82,57 @@
         }
 
         /// <summary>
+        /// Publishes the <paramref name="message"/> on the <see cref="MessageHub"/>.
+        /// </summary>
+        /// <param name="message">The message to published</param>
+        /// <returns>The Task that can be awaited.</returns>
+        public async Task PublishAsync<T>(T message)
+        {
+            var localSubscriptions = _subscriptions.GetTheLatestSubscriptions();
+
+            var msgType = typeof(T);
+
+#if NET_STANDARD
+            var msgTypeInfo = msgType.GetTypeInfo();
+#endif
+            _globalHandler?.Invoke(msgType, message);
+
+            // ReSharper disable once ForCanBeConvertedToForeach | Performance Critical
+            for (var idx = 0; idx < localSubscriptions.Count; idx++)
+            {
+                var subscription = localSubscriptions[idx];
+
+#if NET_STANDARD
+                if (!subscription.Type.GetTypeInfo().IsAssignableFrom(msgTypeInfo)) { continue; }
+#else
+                if (!subscription.Type.IsAssignableFrom(msgType)) { continue; }
+#endif
+                try
+                {
+                    await subscription.HandleAsync(message);
+                }
+                catch (Exception e)
+                {
+                    _globalErrorHandler?.Invoke(subscription.Token, e);
+                }
+            }
+        }
+
+        /// <summary>
         /// Subscribes a callback against the <see cref="MessageHub"/> for a specific type of message.
         /// </summary>
         /// <typeparam name="T">The type of message to subscribe to</typeparam>
         /// <param name="action">The callback to be invoked once the message is published on the <see cref="MessageHub"/></param>
         /// <returns>The token representing the subscription</returns>
         public Guid Subscribe<T>(Action<T> action) => Subscribe(action, TimeSpan.Zero);
+
+        /// <summary>
+        /// Subscribes a callback against the <see cref="MessageHub"/> for a specific type of message.
+        /// </summary>
+        /// <typeparam name="T">The type of message to subscribe to</typeparam>
+        /// <param name="func">The async callback to be invoked once the message is published on the <see cref="MessageHub"/></param>
+        /// <returns>The token representing the subscription</returns>
+        public Guid Subscribe<T>(Func<T, Task> func) => Subscribe(func, TimeSpan.Zero);
 
         /// <summary>
         /// Subscribes a callback against the <see cref="MessageHub"/> for a specific type of message.
@@ -99,6 +145,19 @@
         {
             EnsureNotNull(action);
             return _subscriptions.Register(throttleBy, action);
+        }
+
+        /// <summary>
+        /// Subscribes a callback against the <see cref="MessageHub"/> for a specific type of message.
+        /// </summary>
+        /// <typeparam name="T">The type of message to subscribe to</typeparam>
+        /// <param name="func">The async callback to be invoked once the message is published on the <see cref="MessageHub"/></param>
+        /// <param name="throttleBy">The <see cref="TimeSpan"/> specifying the rate at which subscription is throttled</param>
+        /// <returns>The token representing the subscription</returns>
+        public Guid Subscribe<T>(Func<T, Task> func, TimeSpan throttleBy)
+        {
+            EnsureNotNull(func);
+            return _subscriptions.Register(throttleBy, func);
         }
 
         /// <summary>

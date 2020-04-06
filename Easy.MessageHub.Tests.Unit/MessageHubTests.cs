@@ -1,4 +1,6 @@
-﻿namespace Easy.MessageHub.Tests.Unit
+﻿using System.Threading.Tasks;
+
+namespace Easy.MessageHub.Tests.Unit
 {
     using System;
     using System.Collections.Concurrent;
@@ -508,6 +510,27 @@
             hub2Messages.ShouldBe(new[] { "B", "C", "D" });
 
             hub2.Dispose();
+        }
+
+        [Test]
+        public async Task When_publishing_using_async()
+        {
+            var hub = new MessageHub();
+
+            var queue = new ConcurrentQueue<string>();
+
+            hub.Subscribe<string>(async msg =>
+            {
+                await Task.Delay(1);
+                queue.Enqueue(msg);
+            });
+
+            await hub.PublishAsync("A");
+
+            queue.Count.ShouldBe(1);
+
+            queue.TryDequeue(out var receivedMsg).ShouldBeTrue();
+            receivedMsg.ShouldBe("A");
         }
     }
 }

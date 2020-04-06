@@ -5,6 +5,7 @@ namespace Easy.MessageHub
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal class Subscriptions
@@ -20,7 +21,11 @@ namespace Easy.MessageHub
 
         private bool _disposed;
 
-        internal Guid Register<T>(TimeSpan throttleBy, Action<T> action)
+        internal Guid Register<T>(TimeSpan throttleBy, Action<T> action) => Register<T>(throttleBy, (object)action);
+
+        internal Guid Register<T>(TimeSpan throttleBy, Func<T, Task> func) => Register<T>(throttleBy, (object)func);
+
+        internal Guid Register<T>(TimeSpan throttleBy, object action)
         {
             var type = typeof(T);
             var key = Guid.NewGuid();
@@ -31,7 +36,7 @@ namespace Easy.MessageHub
                 AllSubscriptions.Add(subscription);
                 _subscriptionsChangeCounter++;
             }
-            
+
             return key;
         }
 

@@ -1,6 +1,7 @@
 ﻿namespace Easy.MessageHub
 {
     using System;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// An implementation of the <c>Event Aggregator</c> pattern.
@@ -28,6 +29,12 @@
         /// </summary>
         /// <param name="message">The message to published</param>
         void Publish<T>(T message);
+
+        /// <summary>
+        /// Publishes the <paramref name="message"/> on the <see cref="IMessageHub"/>.
+        /// </summary>
+        /// <param name="message">The message to published</param>
+        Task PublishAsync<T>(T message);
 
         /// <summary>
         /// Subscribes a callback against the <see cref="IMessageHub"/> for a specific type of message.
