@@ -2,13 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="build.bat" />
-    <None Remove="Easy.MessageHub.Benchmarker.Core.v3.ncrunchproject" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Easy.MessageHub\Easy.MessageHub.csproj" />

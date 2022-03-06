@@ -1,40 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <PackageId>Easy.MessageHub</PackageId>
-    <Description>An implementation of the EventAggregator pattern.</Description>
-    <Authors>Nima Ara</Authors>
-    <Copyright>2019 Nima Ara</Copyright>
-    <PackageTags>EventAggregator;MessageHub;Publish;Subscribe</PackageTags>
-    <PackageProjectUrl>https://github.com/NimaAra/Easy.MessageHub</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>-</PackageReleaseNotes>
-    <RepositoryUrl>https://github.com/NimaAra/Easy.MessageHub</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-  </PropertyGroup>
+    <PropertyGroup>
+        <PackageId>Easy.MessageHub</PackageId>
+        <Description>An implementation of the EventAggregator pattern.</Description>
+        <Authors>Nima Ara</Authors>
+        <Copyright>2022 Nima Ara</Copyright>
+        <PackageTags>EventAggregator;MessageHub;Publish;Subscribe</PackageTags>
+        <PackageProjectUrl>https://github.com/NimaAra/Easy.MessageHub</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReleaseNotes>-</PackageReleaseNotes>
+        <RepositoryUrl>https://github.com/NimaAra/Easy.MessageHub</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFrameworks>net45;netstandard1.0</TargetFrameworks>
-    <AssemblyTitle>Easy MessageHub</AssemblyTitle>
-    <AssemblyName>Easy.MessageHub</AssemblyName>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net471;netstandard1.0</TargetFrameworks>
+        <AssemblyTitle>Easy MessageHub</AssemblyTitle>
+        <AssemblyName>Easy.MessageHub</AssemblyName>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System" />
-  </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Easy.MessageHub.Tests.Unit" />
+    </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <DefineConstants>$(DefineConstants);NET_STANDARD</DefineConstants>
-  </PropertyGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
+        <Reference Include="System" />
+    </ItemGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="Properties\**" />
+      <EmbeddedResource Remove="Properties\**" />
+      <None Remove="Properties\**" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Easy.MessageHub.v3.ncrunchproject" />
-  </ItemGroup>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+        <DefineConstants>$(DefineConstants);NET_STANDARD</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
 
 </Project>

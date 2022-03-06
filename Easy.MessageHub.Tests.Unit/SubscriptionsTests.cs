@@ -1,6 +1,7 @@
 ﻿namespace Easy.MessageHub.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using NUnit.Framework;
     using Shouldly;
 
@@ -12,43 +13,43 @@
         {
             Action<int> action = n => { };
             
-            var subs = new Subscriptions();
+            Subscriptions subs = new Subscriptions();
 
-            var key = subs.Register(TimeSpan.Zero, action);
-            key.ShouldNotBeNull();
+            Guid key = subs.Register(TimeSpan.Zero, action);
+            key.ShouldNotBe(default);
 
             subs.IsRegistered(Guid.NewGuid()).ShouldBeFalse();
             subs.IsRegistered(key).ShouldBeTrue();
             subs.UnRegister(key);
             subs.IsRegistered(key).ShouldBeFalse();
 
-            var newKey = subs.Register(TimeSpan.Zero, action);
+            Guid newKey = subs.Register(TimeSpan.Zero, action);
             subs.IsRegistered(newKey).ShouldBeTrue();
             subs.Clear(false);
             subs.IsRegistered(newKey).ShouldBeFalse();
 
-            var subscriptionsSnapshotMain = subs.GetTheLatestSubscriptions();
+            List<Subscription> subscriptionsSnapshotMain = subs.GetTheLatestSubscriptions();
             subscriptionsSnapshotMain.Count.ShouldBe(0);
 
-            var keyA = subs.Register(TimeSpan.Zero, action);
-            var subscriptionsSnapshotA = subs.GetTheLatestSubscriptions();
+            Guid keyA = subs.Register(TimeSpan.Zero, action);
+            List<Subscription> subscriptionsSnapshotA = subs.GetTheLatestSubscriptions();
             subscriptionsSnapshotA.Count.ShouldBe(1);
 
-            var keyB = subs.Register(TimeSpan.Zero, action);
-            var subscriptionsSnapshotB = subs.GetTheLatestSubscriptions();
+            Guid keyB = subs.Register(TimeSpan.Zero, action);
+            List<Subscription> subscriptionsSnapshotB = subs.GetTheLatestSubscriptions();
             subscriptionsSnapshotB.Count.ShouldBe(2);
 
             subs.IsRegistered(keyA).ShouldBeTrue();
-            var subscriptionsSnapshotC = subs.GetTheLatestSubscriptions();
+            List<Subscription> subscriptionsSnapshotC = subs.GetTheLatestSubscriptions();
             subscriptionsSnapshotC.Count.ShouldBe(2);
             subscriptionsSnapshotC.ShouldBeSameAs(subscriptionsSnapshotB);
 
             subs.UnRegister(keyB);
-            var subscriptionsSnapshotD = subs.GetTheLatestSubscriptions();
+            List<Subscription> subscriptionsSnapshotD = subs.GetTheLatestSubscriptions();
             subscriptionsSnapshotD.Count.ShouldBe(1);
 
             subs.Clear(false);
-            var subscriptionsSnapshotE = subs.GetTheLatestSubscriptions();
+            List<Subscription> subscriptionsSnapshotE = subs.GetTheLatestSubscriptions();
             subscriptionsSnapshotE.Count.ShouldBe(0);
         }
     }
