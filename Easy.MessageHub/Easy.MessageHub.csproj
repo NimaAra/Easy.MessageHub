@@ -11,11 +11,10 @@
     <PackageReleaseNotes>-</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/NimaAra/Easy.MessageHub</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <AssemblyTitle>Easy MessageHub</AssemblyTitle>
     <AssemblyName>Easy.MessageHub</AssemblyName>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -25,7 +24,7 @@
     <Reference Include="System" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);NET_STANDARD</DefineConstants>
   </PropertyGroup>
 
