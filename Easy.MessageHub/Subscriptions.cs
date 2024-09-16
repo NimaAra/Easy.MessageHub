@@ -11,11 +11,11 @@ namespace Easy.MessageHub
     {
         private readonly List<Subscription> AllSubscriptions = new List<Subscription>();
         private int _subscriptionsChangeCounter;
-
-        private readonly ThreadLocal<int> _localSubscriptionRevision = 
+        
+        private ThreadLocal<int> _localSubscriptionRevision = 
             new ThreadLocal<int>(() => 0, true);
 
-        private readonly ThreadLocal<List<Subscription>> _localSubscriptions = 
+        private ThreadLocal<List<Subscription>> _localSubscriptions = 
             new ThreadLocal<List<Subscription>>(() => new List<Subscription>(), true);
 
         private bool _disposed;
@@ -28,6 +28,8 @@ namespace Easy.MessageHub
 
             lock (AllSubscriptions)
             {
+                CleanupThreadLocal();
+
                 AllSubscriptions.Add(subscription);
                 _subscriptionsChangeCounter++;
             }
@@ -47,9 +49,10 @@ namespace Easy.MessageHub
 
                 AllSubscriptions.RemoveAt(idx);
 
-                for (var i = 0; i < _localSubscriptions.Values.Count; i++)
+                var localSubscriptionsValues = _localSubscriptions.Values;
+                for (var i = 0; i < localSubscriptionsValues.Count; i++)
                 {
-                    var threadLocal = _localSubscriptions.Values[i];
+                    var threadLocal = localSubscriptionsValues[i];
                     var localIdx = threadLocal.IndexOf(subscription);
                     if (localIdx < 0) { continue; }
 
@@ -57,6 +60,8 @@ namespace Easy.MessageHub
                 }
                 
                 _subscriptionsChangeCounter++;
+
+                CleanupThreadLocal();
             }
         }
 
@@ -68,9 +73,10 @@ namespace Easy.MessageHub
                 
                 AllSubscriptions.Clear();
 
-                for (var i = 0; i < _localSubscriptions.Values.Count; i++)
+                var localSubscriptionsValues = _localSubscriptions.Values;
+                for (var i = 0; i < localSubscriptionsValues.Count; i++)
                 {
-                    _localSubscriptions.Values[i].Clear();
+                    localSubscriptionsValues[i].Clear();
                 }
 
                 if (dispose)
@@ -81,6 +87,7 @@ namespace Easy.MessageHub
                 } 
                 else 
                 {
+                    CleanupThreadLocal();
                     _subscriptionsChangeCounter++;
                 }
             }
@@ -104,12 +111,35 @@ namespace Easy.MessageHub
             List<Subscription> latestSubscriptions;
             lock (AllSubscriptions)
             {
-                latestSubscriptions = AllSubscriptions.ToList();
-            }
+                CleanupThreadLocal();
 
-            _localSubscriptionRevision.Value = changeCounterLatestCopy;
-            _localSubscriptions.Value = latestSubscriptions;
-            return _localSubscriptions.Value;
+                latestSubscriptions = AllSubscriptions.ToList();
+
+                _localSubscriptionRevision.Value = changeCounterLatestCopy;
+                _localSubscriptions.Value = latestSubscriptions;
+                return _localSubscriptions.Value;
+            }
+        }
+
+        /// <summary>
+        /// Each new thread will increase the internal collection of ThreadLocal.Values
+        /// 
+        /// As ThreadLocal.Values doesn't handle the termination of the threads, we trigger the cleanup when ThreadLocal.Values is bigger than the total thread count
+        /// </summary>
+        private void CleanupThreadLocal()
+        {
+            if (_disposed)
+                return;
+
+            // As there are non-user threads, this won't be called too often
+            if (_localSubscriptions.Values.Count <= System.Diagnostics.Process.GetCurrentProcess().Threads.Count)
+                return;
+
+            _localSubscriptionRevision.Dispose();
+            _localSubscriptions.Dispose();
+
+            _localSubscriptionRevision = new ThreadLocal<int>(() => 0, true);
+            _localSubscriptions = new ThreadLocal<List<Subscription>>(() => new List<Subscription>(), true);
         }
     }
 }
