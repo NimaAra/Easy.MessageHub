@@ -12,29 +12,36 @@
 
         private static void Main()
         {
-            //            HubSinglePublisherSingleSubscriber();
-            //            ClassicMethodSinglePublisherSingleSubscriber();
+            // HubSinglePublisherSingleSubscriber();
+            // HubSinglePublisherSingleSubscriber();
+            // ClassicMethodSinglePublisherSingleSubscriber();
+            // ClassicMethodSinglePublisherSingleSubscriber();
 
-            HubSinglePublisherMultipleSubscriber();
-            //            ClassicMethodSinglePublisherMultipleSubscriber();
+            // HubSinglePublisherMultipleSubscriber();
+            // HubSinglePublisherMultipleSubscriber();
+            // ClassicMethodSinglePublisherMultipleSubscriber();
+            // ClassicMethodSinglePublisherMultipleSubscriber();
 
-            //            HubMultiplePublisherSingleSubscriber();
-            //            ClassicMethodMultiplePublisherSingleSubscriber();
+            // HubMultiplePublisherSingleSubscriber();
+            // HubMultiplePublisherSingleSubscriber();
+            // ClassicMethodMultiplePublisherSingleSubscriber();
+            // ClassicMethodMultiplePublisherSingleSubscriber();
 
-            //            HubMultiplePublisherSingleSubscriberAndGlobalAuditHandler();
+            // HubMultiplePublisherSingleSubscriberAndGlobalAuditHandler();
+            // HubMultiplePublisherSingleSubscriberAndGlobalAuditHandler();
 
-            //            HubSinglePublisherMultipleSubscriberThrottled();
+            // HubSinglePublisherMultipleSubscriberThrottled();
 
-            Console.WriteLine($"Gen 0: {GC.CollectionCount(0).ToString()}");
-            Console.WriteLine($"Gen 1: {GC.CollectionCount(1).ToString()}");
-            Console.WriteLine($"Gen 2: {GC.CollectionCount(2).ToString()}");
+            Console.Write($"Gen 0: {GC.CollectionCount(0).ToString()}");
+            Console.Write($" | Gen 1: {GC.CollectionCount(1).ToString()}");
+            Console.WriteLine($" | Gen 2: {GC.CollectionCount(2).ToString()}");
         }
 
         public static void HubMultiplePublisherSingleSubscriberAndGlobalAuditHandler()
         {
             long globalCount = 0;
             long result = 0;
-            var hub = new MessageHub();
+            using MessageHub hub = new();
             hub.RegisterGlobalHandler((type, msg) => Interlocked.Increment(ref globalCount));
 
             Action<string> subscriber = msg => Interlocked.Increment(ref result);
@@ -57,7 +64,7 @@
         public static void HubMultiplePublisherSingleSubscriber()
         {
             long result = 0;
-            var hub = new MessageHub();
+            using MessageHub hub = new();
             Action<string> subscriber = msg => result++;
             hub.Subscribe(subscriber);
 
@@ -75,7 +82,7 @@
         public static void HubSinglePublisherSingleSubscriber()
         {
             long result = 0;
-            var hub = new MessageHub();
+            using MessageHub hub = new();
             Action<string> subscriber = msg => result++;
             hub.Subscribe(subscriber);
 
@@ -91,7 +98,7 @@
         public static void HubSinglePublisherMultipleSubscriber()
         {
             long result = 0;
-            var hub = new MessageHub();
+            using MessageHub hub = new();
             Action<int> subscriber1 = msg => Interlocked.Increment(ref result);
             Action<int> subscriber2 = msg => Interlocked.Increment(ref result);
             Action<int> subscriber3 = msg => Interlocked.Increment(ref result);
@@ -113,8 +120,8 @@
         public static void HubSinglePublisherMultipleSubscriberThrottled()
         {
             long counter = 0;
-            var messageAgg = new MessageHub();
-            messageAgg.RegisterGlobalHandler((type, msg) =>
+            using MessageHub hub = new();
+            hub.RegisterGlobalHandler((type, msg) =>
             {
                 Console.WriteLine($"Global: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
             });
@@ -124,12 +131,12 @@
                 Console.WriteLine($"Subscriber: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
             };
 
-            messageAgg.Subscribe(subscriber, TimeSpan.FromSeconds(1));
+            hub.Subscribe(subscriber, TimeSpan.FromSeconds(1));
 
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed < Duration)
             {
-                messageAgg.Publish(counter++);
+                hub.Publish(counter++);
                 Thread.Sleep(100);
             }
         }
@@ -224,20 +231,8 @@
     {
         private readonly Publisher<T> _publisher;
 
-        public Subscriber(Publisher<T> publisher)
-        {
-            _publisher = publisher;
-        }
+        public Subscriber(Publisher<T> publisher) => _publisher = publisher;
 
-        public void Subscribe(Action<T> onMessage)
-        {
-            _publisher.OnMessage += (sender, msg) => onMessage(msg);
-        }
-    }
-
-    public interface IEventPublisher
-    {
-        void Publish<TEvent>(TEvent sampleEvent);
-        IObservable<TEvent> GetEvent<TEvent>();
+        public void Subscribe(Action<T> onMessage) => _publisher.OnMessage += (sender, msg) => onMessage(msg);
     }
 }

@@ -15,7 +15,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFrameworks>net471;netstandard1.0</TargetFrameworks>
+        <TargetFrameworks>net48;netstandard1.0</TargetFrameworks>
         <AssemblyTitle>Easy MessageHub</AssemblyTitle>
         <AssemblyName>Easy.MessageHub</AssemblyName>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
