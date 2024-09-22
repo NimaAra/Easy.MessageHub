@@ -1,9 +1,8 @@
 ﻿namespace Easy.MessageHub.Tests.Unit
 {
-    using System;
-    using System.Collections.Generic;
     using NUnit.Framework;
     using Shouldly;
+    using System;
 
     [TestFixture]
     internal sealed class SubscriptionsTests
@@ -25,32 +24,48 @@
 
             Guid newKey = subs.Register(TimeSpan.Zero, action);
             subs.IsRegistered(newKey).ShouldBeTrue();
-            subs.Clear(false);
+            subs.Clear();
             subs.IsRegistered(newKey).ShouldBeFalse();
 
-            List<Subscription> subscriptionsSnapshotMain = subs.GetTheLatestSubscriptions();
-            subscriptionsSnapshotMain.Count.ShouldBe(0);
+            Subscription[] buffer = new Subscription[3];
+
+            int count = subs.GetTheLatestSubscriptions(buffer);
+            count.ShouldBe(0);
+            
+            Subscription[] subscriptionsSnapshotMain = buffer;
+            subscriptionsSnapshotMain.ShouldBe([default, default, default]);
 
             Guid keyA = subs.Register(TimeSpan.Zero, action);
-            List<Subscription> subscriptionsSnapshotA = subs.GetTheLatestSubscriptions();
-            subscriptionsSnapshotA.Count.ShouldBe(1);
+            count = subs.GetTheLatestSubscriptions(buffer);
+            count.ShouldBe(1);
+
+            Span<Subscription> subscriptionsSnapshotA = buffer.AsSpan(0, count);
+            Subscription[] remainderBuffer = buffer.AsSpan(count).ToArray();
+            remainderBuffer.ShouldBe([default, default]);
+            subscriptionsSnapshotA[0].Token.ShouldBe(keyA);
 
             Guid keyB = subs.Register(TimeSpan.Zero, action);
-            List<Subscription> subscriptionsSnapshotB = subs.GetTheLatestSubscriptions();
-            subscriptionsSnapshotB.Count.ShouldBe(2);
+            count = subs.GetTheLatestSubscriptions(buffer);
+            count.ShouldBe(2);
+
+            Span<Subscription> subscriptionsSnapshotB = buffer.AsSpan(0, count);
+            remainderBuffer = buffer.AsSpan(count).ToArray();
+            remainderBuffer.ShouldBe([default]);
+            subscriptionsSnapshotB[0].Token.ShouldBe(keyA);
+            subscriptionsSnapshotB[1].Token.ShouldBe(keyB);
 
             subs.IsRegistered(keyA).ShouldBeTrue();
-            List<Subscription> subscriptionsSnapshotC = subs.GetTheLatestSubscriptions();
-            subscriptionsSnapshotC.Count.ShouldBe(2);
-            subscriptionsSnapshotC.ShouldBeSameAs(subscriptionsSnapshotB);
-
+            
             subs.UnRegister(keyB);
-            List<Subscription> subscriptionsSnapshotD = subs.GetTheLatestSubscriptions();
-            subscriptionsSnapshotD.Count.ShouldBe(1);
+            count = subs.GetTheLatestSubscriptions(buffer);
+            count.ShouldBe(1);
 
-            subs.Clear(false);
-            List<Subscription> subscriptionsSnapshotE = subs.GetTheLatestSubscriptions();
-            subscriptionsSnapshotE.Count.ShouldBe(0);
+            Span<Subscription> subscriptionsSnapshotC = buffer.AsSpan(0, count);
+            subscriptionsSnapshotC[0].Token.ShouldBe(keyA);
+            
+            subs.Clear();
+            count = subs.GetTheLatestSubscriptions(buffer);
+            count.ShouldBe(0);
         }
     }
 }

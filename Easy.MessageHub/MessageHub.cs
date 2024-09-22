@@ -1,10 +1,11 @@
 ﻿namespace Easy.MessageHub
 {
     using System;
+    using System.Buffers;
     using System.Diagnostics;
 #if NET_STANDARD
     using System.Reflection;
-#endif   
+#endif
 
     /// <summary>
     /// An implementation of the <c>Event Aggregator</c> pattern.
@@ -12,6 +13,7 @@
     public sealed class MessageHub : IMessageHub
     {
         private readonly Subscriptions _subscriptions;
+        
         private Action<Type, object> _globalHandler;
         private Action<Guid, Exception> _globalErrorHandler;
 
@@ -50,33 +52,42 @@
         /// <param name="message">The message to published</param>
         public void Publish<T>(T message)
         {
-            var localSubscriptions = _subscriptions.GetTheLatestSubscriptions();
-
-            var msgType = typeof(T);
+            Type msgType = typeof(T);
 
 #if NET_STANDARD
             var msgTypeInfo = msgType.GetTypeInfo();
 #endif
+            
             _globalHandler?.Invoke(msgType, message);
+            
+            ArrayPool<Subscription> pool = ArrayPool<Subscription>.Shared;
+            Subscription[] localSubsArr = pool.Rent(_subscriptions.Count);
 
-            // ReSharper disable once ForCanBeConvertedToForeach | Performance Critical
-            for (var idx = 0; idx < localSubscriptions.Count; idx++)
+            try
             {
-                var subscription = localSubscriptions[idx];
+                int count = _subscriptions.GetTheLatestSubscriptions(localSubsArr);
+
+                for (int idx = 0; idx < count; idx++)
+                {
+                    Subscription subscription = localSubsArr[idx];
 
 #if NET_STANDARD
                 if (!subscription.Type.GetTypeInfo().IsAssignableFrom(msgTypeInfo)) { continue; }
 #else
-                if (!subscription.Type.IsAssignableFrom(msgType)) { continue; }
+                    if (!subscription.Type.IsAssignableFrom(msgType)) { continue; }
 #endif
-                try
-                {
-                    subscription.Handle(message);
+                    try
+                    {
+                        subscription.Handle(message);
+                    }
+                    catch (Exception e)
+                    {
+                        _globalErrorHandler?.Invoke(subscription.Token, e);
+                    }
                 }
-                catch (Exception e)
-                {
-                    _globalErrorHandler?.Invoke(subscription.Token, e);
-                }
+            } finally
+            {
+                pool.Return(localSubsArr);
             }
         }
 
@@ -118,7 +129,7 @@
         /// Clears all the subscriptions from the <see cref="MessageHub"/>.
         /// <remarks>The global handler and the global error handler are not affected</remarks>
         /// </summary>
-        public void ClearSubscriptions() => _subscriptions.Clear(false);
+        public void ClearSubscriptions() => _subscriptions.Clear();
 
         /// <summary>
         /// Disposes the <see cref="MessageHub"/>.
@@ -127,11 +138,10 @@
         {
             _globalHandler = null;
             _globalErrorHandler = null;
-            _subscriptions.Clear(true);
         }
 
         [DebuggerStepThrough]
-        private void EnsureNotNull(object obj)
+        private static void EnsureNotNull(object obj)
         {
             if (obj is null) { throw new NullReferenceException(nameof(obj)); }
         }

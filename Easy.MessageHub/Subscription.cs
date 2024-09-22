@@ -6,10 +6,12 @@ namespace Easy.MessageHub
     internal sealed class Subscription
     {
         private const long TicksMultiplier = 1000 * TimeSpan.TicksPerMillisecond;
+        
         private readonly long _throttleByTicks;
+        
         private double? _lastHandleTimestamp;
 
-        internal Subscription(Type type, Guid token, TimeSpan throttleBy, object handler)
+        public Subscription(Type type, Guid token, TimeSpan throttleBy, object handler)
         {
             Type = type;
             Token = token;
@@ -17,7 +19,13 @@ namespace Easy.MessageHub
             _throttleByTicks = throttleBy.Ticks;
         }
 
-        internal void Handle<T>(T message)
+        public Guid Token { get; }
+        
+        public Type Type { get; }
+        
+        private object Handler { get; }
+
+        public void Handle<T>(T message)
         {
             if (!CanHandle()) { return; }
 
@@ -34,8 +42,8 @@ namespace Easy.MessageHub
                 return true;
             }
 
-            var now = Stopwatch.GetTimestamp();
-            var durationInTicks = (now - _lastHandleTimestamp) / Stopwatch.Frequency * TicksMultiplier;
+            long now = Stopwatch.GetTimestamp();
+            double? durationInTicks = (now - _lastHandleTimestamp) / Stopwatch.Frequency * TicksMultiplier;
 
             if (durationInTicks >= _throttleByTicks)
             {
@@ -45,9 +53,5 @@ namespace Easy.MessageHub
 
             return false;
         }
-
-        internal Guid Token { get; }
-        internal Type Type { get; }
-        private object Handler { get; }
     }
 }

@@ -6,6 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Include="..\Easy.MessageHub.Benchmarker.Core\Program.cs" Link="Program.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Easy.MessageHub\Easy.MessageHub.csproj" />
     </ItemGroup>
 

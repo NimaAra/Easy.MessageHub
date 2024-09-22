@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
     using NUnit.Framework;
     using Shouldly;
     
@@ -497,9 +498,6 @@
 
             hub1.Dispose();
 
-            Should.Throw<ObjectDisposedException>(() => hub1.Publish("C"))
-                .Message.ShouldBe("Cannot access a disposed object.\r\nObject name: 'The ThreadLocal object has been disposed.'.");
-            
             hub2.Publish("D");
 
             totalMessages.ShouldBe(new[] { "A", "B", "C", "D" });
@@ -508,6 +506,38 @@
             hub2Messages.ShouldBe(new[] { "B", "C", "D" });
 
             hub2.Dispose();
+        }
+
+        // [Test]
+        public async Task When_creating_many_threads()
+        {
+            using MessageHub hub = new();
+
+            int firstPublishCount = 0;
+            int secondPublishCount = 0;
+
+            string firstReceivedMessage = string.Empty;
+            string secondReceivedMessage = string.Empty;
+
+            Task firstTask = Task.Run(async () =>
+            {
+                hub.Subscribe<string>(msg => Interlocked.Increment(ref firstPublishCount));
+
+                while (true)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    hub.Publish("first");
+                }
+            });
+            
+            Task secondTask = Task.Run(async () =>
+            {
+                hub.Subscribe<string>(msg => Interlocked.Increment(ref secondPublishCount));
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                hub.Publish("second");
+            });
+            
+            await Task.WhenAll(firstTask, secondTask);
         }
     }
 }

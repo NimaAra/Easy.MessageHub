@@ -12,8 +12,8 @@
 
         private static void Main()
         {
-            // HubSinglePublisherSingleSubscriber();
-            // HubSinglePublisherSingleSubscriber();
+            HubSinglePublisherSingleSubscriber();
+            HubSinglePublisherSingleSubscriber();
             // ClassicMethodSinglePublisherSingleSubscriber();
             // ClassicMethodSinglePublisherSingleSubscriber();
 
@@ -41,103 +41,113 @@
         {
             long globalCount = 0;
             long result = 0;
-            using MessageHub hub = new();
-            hub.RegisterGlobalHandler((type, msg) => Interlocked.Increment(ref globalCount));
-
-            Action<string> subscriber = msg => Interlocked.Increment(ref result);
-            hub.Subscribe(subscriber);
-
-            var sw = Stopwatch.StartNew();
-            Action action = () =>
+            using (MessageHub hub = new MessageHub())
             {
-                while (sw.Elapsed < Duration)
+                hub.RegisterGlobalHandler((type, msg) => Interlocked.Increment(ref globalCount));
+
+                Action<string> subscriber = msg => Interlocked.Increment(ref result);
+                hub.Subscribe(subscriber);
+
+                var sw = Stopwatch.StartNew();
+                Action action = () =>
                 {
-                    hub.Publish("Hello there!");
-                }
-            };
+                    while (sw.Elapsed < Duration)
+                    {
+                        hub.Publish("Hello there!");
+                    }
+                };
+                
+                Parallel.Invoke(action, action, action, action, action);
 
-            Parallel.Invoke(action, action, action, action, action);
-
-            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+                Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+            }
         }
 
         public static void HubMultiplePublisherSingleSubscriber()
         {
             long result = 0;
-            using MessageHub hub = new();
-            Action<string> subscriber = msg => result++;
-            hub.Subscribe(subscriber);
-
-            var sw = Stopwatch.StartNew();
-            var tasks = Enumerable.Range(0, 5).Select(n => Task.Run(() =>
+            using (MessageHub hub = new MessageHub())
             {
-                while (true) { hub.Publish("Hello there!"); }
-            })).ToArray();
+                Action<string> subscriber = msg => result++;
+                hub.Subscribe(subscriber);
 
-            Task.WaitAll(tasks, Duration);
+                var sw = Stopwatch.StartNew();
+                var tasks = Enumerable.Range(0, 5).Select(n => Task.Run(() =>
+                {
+                    while (true) { hub.Publish("Hello there!"); }
+                })).ToArray();
 
-            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+                Task.WaitAll(tasks, Duration);
+
+                Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+            }
         }
 
         public static void HubSinglePublisherSingleSubscriber()
         {
             long result = 0;
-            using MessageHub hub = new();
-            Action<string> subscriber = msg => result++;
-            hub.Subscribe(subscriber);
-
-            var sw = Stopwatch.StartNew();
-            while (sw.Elapsed < Duration)
+            using (MessageHub hub = new MessageHub())
             {
-                hub.Publish("Hello there!");
-            }
+                Action<string> subscriber = msg => result++;
+                hub.Subscribe(subscriber);
 
-            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+                var sw = Stopwatch.StartNew();
+                while (sw.Elapsed < Duration)
+                {
+                    hub.Publish("Hello there!");
+                }
+
+                Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+            }
         }
 
         public static void HubSinglePublisherMultipleSubscriber()
         {
             long result = 0;
-            using MessageHub hub = new();
             Action<int> subscriber1 = msg => Interlocked.Increment(ref result);
             Action<int> subscriber2 = msg => Interlocked.Increment(ref result);
             Action<int> subscriber3 = msg => Interlocked.Increment(ref result);
 
-            hub.Subscribe(subscriber1);
-            hub.Subscribe(subscriber2);
-            hub.Subscribe(subscriber3);
-
-            var counter = 0;
-            var sw = Stopwatch.StartNew();
-            while (sw.Elapsed < Duration)
+            using (MessageHub hub = new MessageHub())
             {
-                hub.Publish(counter++);
-            }
+                hub.Subscribe(subscriber1);
+                hub.Subscribe(subscriber2);
+                hub.Subscribe(subscriber3);
 
-            Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+                var counter = 0;
+                var sw = Stopwatch.StartNew();
+                while (sw.Elapsed < Duration)
+                {
+                    hub.Publish(counter++);
+                }
+
+                Console.WriteLine($"Result is: {result:n0} Time Taken: {sw.Elapsed}");
+            }
         }
 
         public static void HubSinglePublisherMultipleSubscriberThrottled()
         {
             long counter = 0;
-            using MessageHub hub = new();
-            hub.RegisterGlobalHandler((type, msg) =>
+            using (MessageHub hub = new MessageHub())
             {
-                Console.WriteLine($"Global: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
-            });
+                hub.RegisterGlobalHandler((type, msg) =>
+                {
+                    Console.WriteLine($"Global: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
+                });
 
-            Action<long> subscriber = msg =>
-            {
-                Console.WriteLine($"Subscriber: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
-            };
+                Action<long> subscriber = msg =>
+                {
+                    Console.WriteLine($"Subscriber: {DateTime.UtcNow:hh:mm:ss.fff} - {msg.ToString()}");
+                };
 
-            hub.Subscribe(subscriber, TimeSpan.FromSeconds(1));
+                hub.Subscribe(subscriber, TimeSpan.FromSeconds(1));
 
-            var sw = Stopwatch.StartNew();
-            while (sw.Elapsed < Duration)
-            {
-                hub.Publish(counter++);
-                Thread.Sleep(100);
+                var sw = Stopwatch.StartNew();
+                while (sw.Elapsed < Duration)
+                {
+                    hub.Publish(counter++);
+                    Thread.Sleep(100);
+                }
             }
         }
 

@@ -4,44 +4,47 @@
         <PackageId>Easy.MessageHub</PackageId>
         <Description>An implementation of the EventAggregator pattern.</Description>
         <Authors>Nima Ara</Authors>
-        <Copyright>2022 Nima Ara</Copyright>
+        <Copyright>2024 Nima Ara</Copyright>
         <PackageTags>EventAggregator;MessageHub;Publish;Subscribe</PackageTags>
         <PackageProjectUrl>https://github.com/NimaAra/Easy.MessageHub</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReleaseNotes>-</PackageReleaseNotes>
         <RepositoryUrl>https://github.com/NimaAra/Easy.MessageHub</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFrameworks>net48;netstandard1.0</TargetFrameworks>
+        <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
+        <LangVersion>latest</LangVersion>
         <AssemblyTitle>Easy MessageHub</AssemblyTitle>
         <AssemblyName>Easy.MessageHub</AssemblyName>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
-    <ItemGroup>
-        <InternalsVisibleTo Include="Easy.MessageHub.Tests.Unit" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
         <Reference Include="System" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Properties\**" />
-      <EmbeddedResource Remove="Properties\**" />
-      <None Remove="Properties\**" />
+        <Compile Remove="Properties\**" />
+        <EmbeddedResource Remove="Properties\**" />
+        <None Remove="Properties\**" />
     </ItemGroup>
 
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
         <DefineConstants>$(DefineConstants);NET_STANDARD</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Easy.MessageHub.Tests.Unit" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Memory" Version="4.5.5" />
+    </ItemGroup>
 
 </Project>
